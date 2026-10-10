@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LicitaTR · OmniLicit — Termo de Referência (Lei nº 14.133/2021)</title>
+<meta name="description" content="Módulo LicitaTR do ecossistema OmniLicit — elaboração auditável de Termos de Referência." />
+
+<!-- Favicon dinâmico (trocado via JS pelo LogoManager) -->
+<link rel="icon" id="favicon" type="image/png" href="OmniLicit.png" />
+
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: {
+            50:'#eff9fb',100:'#d7f0f5',200:'#b0e1eb',300:'#7ccbdd',400:'#43adc7',
+            500:'#1f8fae',600:'#157392',700:'#155d78',800:'#164d63',900:'#164054',950:'#0b2b3b'
+          }
+        },
+        fontFamily: { sans: ['Inter','system-ui','Segoe UI','Roboto','sans-serif'] }
+      }
+    }
+  };
+</script>
+
+<!-- pdfMake -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+<!-- pdf.js (leitura de DFD/ETP em PDF) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: Inter, system-ui, sans-serif; }
+
+  details > summary { list-style: none; cursor: pointer; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] .chev { transform: rotate(180deg); }
+  .chev { transition: transform .18s ease; }
+
+  .lbl  { display:block; font-size:.72rem; font-weight:600; letter-spacing:.02em;
+          text-transform:uppercase; color:#64748b; margin-bottom:.3rem; }
+  .inp  { width:100%; border:1px solid #cbd5e1; border-radius:.55rem; padding:.5rem .7rem;
+          font-size:.85rem; background:#fff; transition:.15s; outline:none; }
+  .inp:focus { border-color:#1f8fae; box-shadow:0 0 0 3px rgba(31,143,174,.15); }
+  .inp-sm { width:100%; border:1px solid #e2e8f0; border-radius:.4rem; padding:.3rem .45rem;
+            font-size:.78rem; background:#fff; outline:none; }
+  .inp-sm:focus { border-color:#1f8fae; box-shadow:0 0 0 2px rgba(31,143,174,.15); }
+  .ta { min-height:110px; resize:vertical; }
+
+  .btn { display:inline-flex; align-items:center; gap:.45rem; border-radius:.6rem;
+         padding:.5rem .9rem; font-size:.8rem; font-weight:600; transition:.15s; cursor:pointer;
+         border:1px solid transparent; }
+  .btn-primary { background:#155d78; color:#fff; }
+  .btn-primary:hover { background:#164d63; }
+  .btn-ghost { background:#fff; color:#155d78; border-color:#cbd5e1; }
+  .btn-ghost:hover { background:#f1f5f9; }
+  .btn-danger { background:#fee2e2; color:#b91c1c; }
+  .btn-danger:hover { background:#fecaca; }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+
+  .badge { display:inline-flex; align-items:center; gap:.25rem; border-radius:999px;
+           padding:.1rem .5rem; font-size:.65rem; font-weight:700; text-transform:uppercase;
+           letter-spacing:.03em; }
+  .sev-critico { background:#fee2e2; color:#b91c1c; }
+  .sev-alerta  { background:#fef3c7; color:#b45309; }
+  .sev-info    { background:#e0f2fe; color:#0369a1; }
+  .sev-ok      { background:#dcfce7; color:#15803d; }
+
+  .drop { border:2px dashed #94a3b8; border-radius:.9rem; padding:1.5rem; text-align:center;
+          transition:.18s; background:#f8fafc; }
+  .drop.hot { border-color:#1f8fae; background:#eff9fb; }
+
+  ::-webkit-scrollbar { width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:999px; border:2px solid #f1f5f9; }
+  ::-webkit-scrollbar-thumb:hover { background:#94a3b8; }
+
+  @media print { .no-print { display:none !important; } }
+</style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 antialiased">
+
+<!-- ══════════════════════ HEADER ══════════════════════ -->
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200 no-print">
+  <div class="max-w-[1600px] mx-auto px-4 py-3 flex items-center gap-4">
+    <img data-logo src="OmniLicit.png" alt="OmniLicit"
+         class="h-12 w-12 object-contain shrink-0"
+         onerror="this.onerror=null;this.src='OmniLicit.png';" />
+    <div class="min-w-0">
+      <h1 class="text-lg font-bold text-brand-900 leading-tight">LicitaTR
+        <span class="text-xs font-medium text-slate-400 align-middle">· OmniLicit</span>
+      </h1>
+      <p class="text-[11px] text-slate-500 truncate">
+        Termo de Referência · Lei nº 14.133/2021 · <span id="hdrOrgao">Órgão não informado</span>
+      </p>
+    </div>
+
+    <div class="ml-auto flex items-center gap-2">
+      <span id="seloPreview"
+            class="hidden md:inline-flex badge bg-brand-50 text-brand-700 font-mono normal-case">
+        OMNILICIT::TR::—::—
+      </span>
+      <button class="btn btn-ghost" id="btnSalvar">💾 Rascunho</button>
+      <button class="btn btn-ghost" id="btnAuditoria">📦 Pacote Auditoria</button>
+      <button class="btn btn-primary" id="btnPdf">📄 Gerar PDF</button>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════ MAIN ══════════════════════ -->
+<main class="max-w-[1600px] mx-auto px-4 py-6 grid grid-cols-1 xl:grid-cols-12 gap-6">
+
+  <!-- ─────────── COLUNA ESQUERDA ─────────── -->
+  <div class="xl:col-span-8 space-y-4" id="formulario">
+
+    <!-- 1. ÓRGÃO -->
+    <details open class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <summary class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+        <span class="w-7 h-7 rounded-lg bg-brand-700 text-white text-xs font-bold grid place-items-center">1</span>
+        <span class="font-semibold text-sm text-slate-700">Órgão, Identidade Visual e Responsáveis</span>
+        <span class="chev ml-auto text-slate-400">▾</span>
+      </summary>
+
+      <div class="p-4 grid md:grid-cols-2 gap-4">
+        <label class="block md:col-span-2">
+          <span class="lbl">Razão Social do Órgão / Entidade</span>
+          <input class="inp" data-bind="orgao.nome" placeholder="Ex.: Prefeitura Municipal de Taubaté" />
+        </label>
+
+        <label class="block">
+          <span class="lbl">CNPJ</span>
+          <input class="inp" data-bind="orgao.cnpj" placeholder="00.000.000/0000-00" />
+        </label>
+
+        <label class="block">
+          <span class="lbl">Unidade / Setor Demandante</span>
+          <input class="inp" data-bind="orgao.unidade" placeholder="Ex.: Secretaria de Administração" />
+        </label>
+
+        <label class="block">
+          <span class="lbl">Autoridade Responsável</span>
+          <input class="inp" data-bind="orgao.responsavel" placeholder="Nome completo" />
+        </label>
+
+        <label class="block">
+          <span class="lbl">Cargo / Função</span>
+          <input class="inp" data-bind="orgao.cargo" placeholder="Ex.: Secretário Municipal" />
+        </label>
+
+        <!-- Logo dinâmico -->
+        <div class="md:col-span-2 border-t border-slate-200 pt-4">
+          <span class="lbl">Logotipo Institucional (fallback automático: OmniLicit.png)</span>
+          <div class="flex flex-wrap items-center gap-4 mt-1">
+            <img id="logoPreview" src="OmniLicit.png" alt="Pré-visualização"
+                 class="h-16 w-16 object-contain rounded-lg border border-slate-200 bg-white p-1"
+                 onerror="this.onerror=null;this.src='OmniLicit.png';" />
+            <div class="flex-1 min-w-[220px]">
+              <input type="file" id="logoInput" accept="image/png,image/jpeg,image/svg+xml"
+                     class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3
+                            file:rounded-lg file:border-0 file:text-xs file:font-semibold
+                            file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100" />
+              <p class="text-[11px] text-slate-400 mt-1">
+                Sem upload, o sistema utiliza o escudo facetado oficial do OmniLicit.
+              </p>
+            </div>
+            <button class="btn btn-ghost" id="btnLogoReset" type="button">↺ Restaurar padrão</button>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 2. REGRAS INSTITUCIONAIS -->
+    <details open class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <summary class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+        <span class="w-7 h-7 rounded-lg bg-brand-700 text-white text-xs font-bold grid place-items-center">2</span>
+        <span class="font-semibold text-sm text-slate-700">Regras Normativas Próprias do Órgão (Compliance)</span>
+        <span id="regrasCount" class="badge bg-brand-50 text-brand-700">0</span>
+        <span class="chev ml-auto text-slate-400">▾</span>
+      </summary>
+
+      <div class="p-4 space-y-4">
+        <div class="flex flex-wrap gap-2">
+          <button class="btn btn-ghost" id="btnRegrasExemplo" type="button">⚡ Carregar exemplos (UNITAU)</button>
+          <button class="btn btn-ghost" id="btnRegrasLimpar" type="button">🗑 Limpar regras</button>
+        </div>
+
+        <div id="regrasList" class="space-y-2"></div>
+
+        <form id="formRegra" class="grid md:grid-cols-12 gap-3 bg-slate-50 border border-slate-200 rounded-lg p-3">
+          <label class="block md:col-span-6">
+            <span class="lbl">Título da regra</span>
+            <input class="inp" name="titulo" required placeholder="Ex.: UNITAU — Isenção total de frete" />
+          </label>
+          <label class="block md:col-span-3">
+            <span class="lbl">Tipo de verificação</span>
+            <select class="inp" name="tipo">
+              <option value="contem">Exige cláusula (contém)</option>
+              <option value="nao_contem">Veda termo (não contém)</option>
+              <option value="regex">Veda padrão (regex)</option>
+              <option value="campo_vazio">Campo obrigatório preenchido</option>
+            </select>
+          </label>
+          <label class="block md:col-span-3">
+            <span class="lbl">Severidade</span>
+            <select class="inp" name="severidade">
+              <option value="critico">Crítico</option>
+              <option value="alerta" selected>Alerta</option>
+              <option value="info">Informativo</option>
+            </select>
+          </label>
+          <label class="block md:col-span-4">
+            <span class="lbl">Campo-alvo</span>
+            <select class="inp" name="alvo">
+              <option value="full">Documento completo (texto integral)</option>
+              <option value="processo.objeto">Objeto</option>
+              <option value="processo.justificativa">Justificativa</option>
+              <option value="processo.especificacoes">Especificações técnicas</option>
+              <option value="processo.modeloExecucao">Modelo de execução</option>
+              <option value="processo.pagamento">Condições de pagamento</option>
+              <option value="processo.garantia">Garantia contratual</option>
+              <option value="processo.sancoes">Sanções</option>
+              <option value="processo.sustentabilidade">Sustentabilidade</option>
+              <option value="processo.lgpd">LGPD</option>
+              <option value="processo.observacoes">Disposições gerais</option>
+            </select>
+          </label>
+          <label class="block md:col-span-5">
+            <span class="lbl">Termo / Padrão</span>
+            <input class="inp" name="valor" placeholder="Ex.: cobrança de frete" />
+          </label>
+          <label class="block md:col-span-3">
+            <span class="lbl">Fundamento interno</span>
+            <input class="inp" name="fundamento" placeholder="Ex.: Norma Interna nº 12/2023" />
+          </label>
+          <div class="md:col-span-12 flex justify-end">
+            <button class="btn btn-primary" type="submit">＋ Adicionar regra</button>
+          </div>
+        </form>
+      </div>
+    </details>
+
+    <!-- 3. PROCESSO -->
+    <details open class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <summary class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+        <span class="w-7 h-7 rounded-lg bg-brand-700 text-white text-xs font-bold grid place-items-center">3</span>
+        <span class="font-semibold text-sm text-slate-700">Identificação do Processo e Tipo de Contratação</span>
+        <span class="chev ml-auto text-slate-400">▾</span>
+      </summary>
+
+      <div class="p-4 space-y-4">
+        <div class="grid md:grid-cols-3 gap-4">
+          <label class="block">
+            <span class="lbl">Nº do Processo Administrativo</span>
+            <input class="inp" data-bind="processo.numero" placeholder="Ex.: 2025/000123" />
+          </label>
+          <label class="block">
+            <span class="lbl">Modalidade</span>
+            <select class="inp" data-bind="processo.modalidade">
+              <option>Pregão Eletrônico</option>
+              <option>Concorrência Eletrônica</option>
+              <option>Concurso</option>
+              <option>Leilão</option>
+              <option>Diálogo Competitivo</option>
+              <option>Dispensa Eletrônica</option>
+              <option>Inexigibilidade</option>
+            </select>
+          </label>
+          <label class="block">
+            <span class="lbl">Regime / Critério de Julgamento</span>
+            <input class="inp" data-bind="processo.regime" placeholder="Ex.: Menor Preço por Item" />
+          </label>
+        </div>
+
+        <div>
+          <span class="lbl">Tipo de Contratação (altera seções do TR)</span>
+          <div id="tipoSelector" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 mt-1"></div>
+          <p class="text-[11px] text-slate-500 mt-2">
+            Fundamentação aplicável: <span id="tipoFundamento" class="font-medium text-brand-700">—</span>
+          </p>
+        </div>
+
+        <div id="camposDinamicos" class="grid md:grid-cols-2 gap-4 border-t border-slate-200 pt-4"></div>
+      </div>
+    </details>
+
+    <!-- 4. IMPORTAÇÃO DFD / ETP -->
+    <details open class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <summary class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+        <span class="w-7 h-7 rounded-lg bg-brand-700 text-white text-xs font-bold grid place-items-center">4</span>
+        <span class="font-semibold text-sm text-slate-700">Importação Inteligente — LicitaReq (DFD) / LicitaETP (ETP)</span>
+        <span class="chev ml-auto text-slate-400">▾</span>
+      </summary>
+
+      <div class="p-4 space-y-3">
+        <div id="dropzone" class="drop cursor-pointer">
+          <input type="file" id="fileImport" class="hidden" accept=".json,.pdf,application/json,application/pdf" multiple />
+          <p class="text-3xl">📥</p>
+          <p class="text-sm font-semibold text-slate-700 mt-1">Arraste o arquivo JSON ou PDF gerado pelo LicitaReq / LicitaETP</p>
+          <p class="text-[11px] text-slate-500 mt-1">ou clique para selecionar · .json · .pdf</p>
+        </div>
+
+        <div id="importLog" class="hidden text-xs rounded-lg border p-3 whitespace-pre-wrap font-mono"></div>
+
+        <div class="flex flex-wrap gap-2">
+          <button class="btn btn-ghost" id="btnImportDemo" type="button">🧪 Carregar exemplo de demonstração</button>
+        </div>
+      </div>
+    </details>
+
+    <!-- 5. OBJETO E JUSTIFICATIVA -->
+    <details open class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <summary class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+        <span class="w-7 h-7 rounded-lg bg-brand-700 text-white text-xs font-bold grid place-items-center">5</span>
+        <span class="font-semibold text-sm text-slate-700">Objeto, Justificativa e Descrição da Solução</span>
+        <span class="chev ml-auto text-slate-400">▾</span>
+      </summary>
+
+      <div class="p-4 space-y-4">
+        <label class="block">
+          <span class="lbl">Objeto da Contratação (art. 6º, XXIII)</span>
+          <textarea class="inp ta" data-bind="processo.objeto"
+            placeholder="Ex.: Aquisição de 120 (cento e vinte) cadeiras de escritório, conforme especificações técnicas..."></textarea>
+        </label>
+
+        <label class="block">
+          <span class="lbl">Justificativa / Motivação da Necessidade</span>
+          <textarea class="inp ta" data-bind="processo.justificativa"
+            placeholder="Descreva o problema público, a necessidade administrativa e o nexo causal com a contratação..."></textarea>
+        </label>
+
+        <label class="block">
+          <span class="lbl">Descrição da Solução / Especificações Técnicas</span>
+          <textarea class="inp ta" data-bind="processo.especificacoes"
+            placeholder="Requisitos técnicos, normas ABNT, padrões de qualidade, dimensões, materiais..."></textarea>
+        </label>
+      </div>
+    </details>
+
+    <!-- 6. ITENS -->
+    <details open class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <summary class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+        <span class="w-7 h-7 rounded-lg bg-brand-700 text-white text-xs font-bold grid place-items-center">6</span>
+        <span class="font-semibold text-sm text-slate-700">Itens, Quantidades e Estimativa de Valor</span>
+        <span id="itensBadge" class="badge bg-slate-100 text-slate-600">0 itens</span>
+        <span class="chev ml-auto text-slate-400">▾</span>
+      </summary>
+
+      <div class="p-4 space-y-3">
+        <div class="overflow-x-auto border border-slate-200 rounded-lg">
+          <table class="w-full text-xs">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider">
+              <tr>
+                <th class="px-3 py-2 text-left w-10">#</th>
+                <th class="px-3 py-2 text-left">Descrição</th>
+                <th class="px-3 py-2 text-left w-20">Un.</th>
+                <th class="px-3 py-2 text-right w-24">Qtd.</th>
+                <th class="px-3 py-2 text-right w-32">Vl. Unit.</th>
+                <th class="px-3 py-2 text-right w-32">Total</th>
+                <th class="w-10"></th>
+              </tr>
+            </thead>
+            <tbody id="itensBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button class="btn btn-ghost" id="btnAddItem" type="button">＋ Adicionar item</button>
+          <button class="btn btn-danger" id="btnClearItens" type="button">🗑 Limpar itens</button>
+          <div class="ml-auto text-sm font-semibold text-slate-700">
+            Valor Global Estimado:
+            <span id="valorGlobal" class="text-brand-700">R$ 0,00</span>
+          </div>
+        </div>
+
+        <label class="block">
+          <span class="lbl">Dotação Orçamentária</span>
+          <input class="inp" data-bind="processo.dotacao"
+                 placeholder="Ex.: 02.001.04.122.0002.2003.33903000 — Fonte 01 — Exercício 2025" />
+        </label>
+      </div>
+    </details>
+
+    <!-- 7. PRAZOS -->
+    <details open class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <summary class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+        <span class="w-7 h-7 rounded-lg bg-brand-700 text-white text-xs font-bold grid place-items-center">7</span>
+        <span class="font-semibold text-sm text-slate-700">Prazos, Vigência e Execução</span>
+        <span class="chev ml-auto text-slate-400">▾</span>
+      </summary>
+
+      <div class="p-4 grid md:grid-cols-2 gap-4">
+        <label class="block">
+          <span class="lbl">Prazo de Vigência Contratual</span>
+          <input class="inp" data-bind="processo.vigencia" placeholder="Ex.: 12 (doze) meses, prorrogável por até 60 meses" />
+        </label>
+        <label class="block">
+          <span class="lbl">Prazo de Execução / Entrega</span>
+          <input class="inp" data-bind="processo.prazoExecucao" placeholder="Ex.: 30 (trinta) dias corridos após o recebimento da nota de empenho" />
+        </label>
+        <label class="block md:col-span-2">
+          <span class="lbl">Cronograma / Marco de Execução</span>
+          <textarea class="inp" data-bind="processo.cronograma" rows="3"
+            placeholder="Ex.: Etapa 1 — mobilização em 5 dias; Etapa 2 — entrega parcial em 15 dias; Etapa 3 — conclusão em 30 dias."></textarea>
+        </label>
+      </div>
+    </details>
+
+    <!-- 8. FISCALIZAÇÃO -->
+    <details open class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <summary class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+        <span class="w-7 h-7 rounded-lg bg-brand-700 text-white text-xs font-bold grid place-items-center">8</span>
+        <span class="font-semibold text-sm text-slate-700">Modelo de Gestão e Equipe de Fiscalização</span>
+        <span class="chev ml-auto text-slate-400">▾</span>
+      </summary>
+
+      <div class="p-4 grid md:grid-cols-3 gap-4">
+        <label class="block">
+          <span class="lbl">Gestor do Contrato</span>
+          <input class="inp" data-bind="equipe.gestor" placeholder="Nome / matrícula" />
+        </label>
+        <label class="block">
+          <span class="lbl">Fiscal Técnico</span>
+          <input class="inp" data-bind="equipe.fiscalTecnico" placeholder="Nome / matrícula" />
+        </label>
+        <label class="block">
+          <span class="lbl">Fiscal Administrativo</span>
+          <input class="inp" data-bind="equipe.fiscalAdministrativo" placeholder="Nome / matrícula" />
+        </label>
+        <label class="block md:col-span-3">
+          <span class="lbl">Modelo de Gestão / Rotinas de Fiscalização</span>
+          <textarea class="inp" data-bind="processo.modeloGestao" rows="3"
+            placeholder="Ex.: Vistoria trimestral, relatório de conformidade, aceite definitivo em 15 dias (art. 140 da Lei nº 14.133/2021)."></textarea>
+        </label>
+      </div>
+    </details>
+
+    <!-- 9. CONDIÇÕES CONTRATUAIS -->
+    <details open class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <summary class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+        <span class="w-7 h-7 rounded-lg bg-brand-700 text-white text-xs font-bold grid place-items-center">9</span>
+        <span class="font-semibold text-sm text-slate-700">Execução, Pagamento, Garantia e Sanções</span>
+        <span class="chev ml-auto text-slate-400">▾</span>
+      </summary>
+
+      <div class="p-4 space-y-4">
+        <label class="block">
+          <span class="lbl">Modelo de Execução e Obrigações da Contratada</span>
+          <textarea class="inp ta" data-bind="processo.modeloExecucao"
+            placeholder="Rotinas, obrigações, condições de entrega, frete, instalação, treinamento..."></textarea>
+        </label>
+        <label class="block">
+          <span class="lbl">Condições de Pagamento</span>
+          <textarea class="inp ta" data-bind="processo.pagamento"
+            placeholder="Ex.: Pagamento em até 30 (trinta) dias após o aceite definitivo, mediante nota fiscal atestada..."></textarea>
+        </label>
+        <label class="block">
+          <span class="lbl">Garantia Contratual (art. 96 e ss.)</span>
+          <textarea class="inp" data-bind="processo.garantia" rows="3"
+            placeholder="Ex.: Garantia de execução de 5% do valor inicial, nas modalidades do art. 96, §1º..."></textarea>
+        </label>
+        <label class="block">
+          <span class="lbl">Sanções Administrativas (arts. 155 a 163)</span>
+          <textarea class="inp" data-bind="processo.sancoes" rows="3"
+            placeholder="Advertência, multa, impedimento de licitar e declaração de inidoneidade..."></textarea>
+        </label>
+      </div>
+    </details>
+
+    <!-- 10. SUSTENTABILIDADE / LGPD / GERAIS -->
+    <details class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <summary class="flex items-center gap-3 px-4 py-3 bg-slate-50 border-b border-slate-200">
+        <span class="w-7 h-7 rounded-lg bg-brand-700 text-white text-xs font-bold grid place-items-center">10</span>
+        <span class="font-semibold text-sm text-slate-700">Sustentabilidade, LGPD e Disposições Gerais</span>
+        <span class="chev ml-auto text-slate-400">▾</span>
+      </summary>
+
+      <div class="p-4 space-y-4">
+        <label class="block">
+          <span class="lbl">Critérios de Sustentabilidade (art. 5º e IN 01/2010)</span>
+          <textarea class="inp" data-bind="processo.sustentabilidade" rows="3"
+            placeholder="Ex.: Bens com certificação ambiental, logística reversa, eficiência energética..."></textarea>
+        </label>
+        <label class="block">
+          <span class="lbl">Proteção de Dados (LGPD — Lei nº 13.709/2018)</span>
+          <textarea class="inp" data-bind="processo.lgpd" rows="3"
+            placeholder="Ex.: Tratamento de dados pessoais limitado à execução do objeto, com base legal no art. 7º, II..."></textarea>
+        </label>
+        <label class="block">
+          <span class="lbl">Disposições Gerais e Observações</span>
+          <textarea class="inp ta" data-bind="processo.observacoes"
+            placeholder="Cláusulas complementares, anexos, vinculação ao edital..."></textarea>
+        </label>
+      </div>
+    </details>
+  </div>
+
+  <!-- ─────────── COLUNA DIREITA — AUDITORIA ─────────── -->
+  <aside class="xl:col-span-4 space-y-4">
+    <div class="xl:sticky xl:top-24 space-y-4">
+
+      <!-- Score -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-bold text-slate-700">Auditoria em Tempo Real</h2>
+          <span id="auditScore" class="badge sev-ok">100%</span>
+        </div>
+
+        <div class="mt-3 h-2 rounded-full bg-slate-100 overflow-hidden">
+          <div id="auditBar" class="h-full bg-emerald-500 transition-all duration-300" style="width:100%"></div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+          <div class="rounded-lg bg-red-50 py-2">
+            <p id="cntCritico" class="text-lg font-bold text-red-600">0</p>
+            <p class="text-[10px] uppercase tracking-wide text-red-500 font-semibold">Crítico</p>
+          </div>
+          <div class="rounded-lg bg-amber-50 py-2">
+            <p id="cntAlerta" class="text-lg font-bold text-amber-600">0</p>
+            <p class="text-[10px] uppercase tracking-wide text-amber-500 font-semibold">Alerta</p>
+          </div>
+          <div class="rounded-lg bg-sky-50 py-2">
+            <p id="cntInfo" class="text-lg font-bold text-sky-600">0</p>
+            <p class="text-[10px] uppercase tracking-wide text-sky-500 font-semibold">Info</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de apontamentos -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center gap-2">
+          <h3 class="text-sm font-semibold text-slate-700">Apontamentos</h3>
+          <span id="auditTotal" class="badge bg-slate-200 text-slate-600">0</span>
+        </div>
+        <div id="auditList" class="max-h-[420px] overflow-y-auto divide-y divide-slate-100"></div>
+      </div>
+
+      <!-- Rastreabilidade -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 space-y-3">
+        <h3 class="text-sm font-semibold text-slate-700">Rastreabilidade OmniLicit</h3>
+
+        <div class="text-[11px] space-y-2">
+          <div>
+            <p class="lbl mb-1">Selo Digital</p>
+            <code id="traceSelo" class="block bg-slate-900 text-brand-200 rounded-lg px-3 py-2 font-mono text-[10px] break-all">
+              OMNILICIT::TR::—::—
+            </code>
+          </div>
+          <div>
+            <p class="lbl mb-1">Hash SHA-256 (integridade)</p>
+            <code id="traceHash" class="block bg-slate-900 text-emerald-300 rounded-lg px-3 py-2 font-mono text-[10px] break-all">
+              aguardando conteúdo…
+            </code>
+          </div>
+          <div>
+            <p class="lbl mb-1">Auditoria cruzada</p>
+            <p class="text-slate-500">
+              Módulo <strong>LicitaAudit</strong> · <span id="traceTs">—</span>
+            </p>
+          </div>
+        </div>
+
+        <button class="btn btn-primary w-full justify-center" id="btnPdf2" type="button">📄 Gerar Termo de Referência</button>
+      </div>
+
+    </div>
+  </aside>
+</main>
+
+<footer class="max-w-[1600px] mx-auto px-4 pb-8 text-center text-[11px] text-slate-400 no-print">
+  OmniLicit · LicitaTR v1.0.0 — Ecossistema de Licitações Públicas · Lei nº 14.133/2021
+</footer>
+
+<!-- ══════════════════════════════════════════════════════════════
+     JAVASCRIPT MODULAR — LicitaTR
+     ══════════════════════════════════════════════════════════════ -->
+<script>
+/* ============================================================
+   MÓDULO 0 — UTILITÁRIOS
+   ============================================================ */
+const Utils = (() => {
+  const $  = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+  const uid = (prefix = 'id') =>
+    `${prefix}_${Math.random().toString(36).slice(2, 9)}${Date.now().toString(36).slice(-4)}`;
+
+  const getPath = (obj, path) =>
+    String(path).split('.').reduce((acc, k) => (acc == null ? undefined : acc[k]), obj);
+
+  const setPath = (obj, path, value) => {
+    const keys = String(path).split('.');
+    const last = keys.pop();
+    const target = keys.reduce((acc, k) => (acc[k] = acc[k] || {}), obj);
+    target[last] = value;
+  };
+
+  const debounce = (fn, ms = 260) => {
+    let t;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  };
+
+  const escapeHtml = (s = '') =>
+    String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+  const toNumber = (v) => {
+    if (typeof v === 'number') return v;
+    const n = Number(String(v ?? '').replace(/[^\d,.-]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.'));
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const formatBRL = (v) =>
+    toNumber(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  const formatNumber = (v) =>
+    toNumber(v).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+  /** SHA-256 com WebCrypto + fallback determinístico (ambientes sem secure context) */
+  const sha256Hex = async (str) => {
+    try {
+      if (window.crypto && window.crypto.subtle) {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+    } catch (_) { /* cai no fallback */ }
+    // Fallback não-criptográfico (apenas para preview em file:// sem secure context)
+    let h1 = 0x811c9dc5, h2 = 0x1000193;
+    for (let i = 0; i < str.length; i++) {
+      const c = str.charCodeAt(i);
+      h1 = (h1 ^ c) * 16777619 >>> 0;
+      h2 = (h2 + c * (i + 1)) >>> 0;
+    }
+    return (h1.toString(16).padStart(8, '0') + h2.toString(16).padStart(8, '0')).repeat(4).slice(0, 64);
+  };
+
+  /** Serialização canônica (chaves ordenadas) — garante hash determinístico */
+  const canonicalize = (v) => {
+    if (Array.isArray(v)) return '[' + v.map(canonicalize).join(',') + ']';
+    if (v && typeof v === 'object') {
+      return '{' + Object.keys(v).sort()
+        .map(k => JSON.stringify(k) + ':' + canonicalize(v[k])).join(',') + '}';
+    }
+    return JSON.stringify(v === undefined ? null : v);
+  };
+
+  const download = (blob, filename) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  };
+
+  const fileToDataUrl = (file) => new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result);
+    fr.onerror = reject;
+    fr.readAsDataURL(file);
+  });
+
+  /** Converte URL/path em dataURL (necessário para embutir o logo no pdfMake) */
+  const srcToDataUrl = async (src) => {
+    if (!src) return null;
+    if (src.startsWith('data:')) return src;
+    try {
+      const res = await fetch(src, { cache: 'force-cache' });
+      const blob = await res.blob();
+      return await new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = reject;
+        fr.readAsDataURL(blob);
+      });
+    } catch (_) { return null; }
+  };
+
+  return { $, $$, uid, getPath, setPath, debounce, escapeHtml, toNumber, formatBRL,
+           formatNumber, sha256Hex, canonicalize, download, fileToDataUrl, srcToDataUrl };
+})();
+
+const { $, $$, uid, getPath, setPath, debounce, escapeHtml, toNumber,
+        formatBRL, formatNumber, sha256Hex, canonicalize, download,
+        fileToDataUrl, srcToDataUrl } = Utils;
+
+
+/* ============================================================
+   MÓDULO 1 — DEFINIÇÃO DOS TIPOS DE PROCESSO
+   ============================================================ */
+const TIPOS_PROCESSO = {
+  bens_comuns: {
+    label: 'Aquisição de Bens Comuns',
+    icone: '📦',
+    fundamento: 'Lei nº 14.133/2021, arts. 6º, XIII; 40 e 41 — bens de prateleira, especificação usual de mercado.',
+    campos: [
+      { path: 'processo.prazoEntrega',    label: 'Prazo de Entrega',        ph: 'Ex.: 30 (trinta) dias corridos' },
+      { path: 'processo.localEntrega',    label: 'Local de Entrega',        ph: 'Ex.: Almoxarifado Central — Rua X, 100' },
+      { path: 'processo.garantiaBens',    label: 'Garantia dos Bens',       ph: 'Ex.: 12 meses contra vícios de fabricação' },
+      { path: 'processo.amostra',         label: 'Amostra / Prova de Conceito', tipo: 'select',
+        opcoes: ['Não exigida', 'Exigida do licitante provisoriamente classificado (art. 41, II)'] },
+      { path: 'processo.assistenciaTecnica', label: 'Assistência Técnica',  ph: 'Ex.: 12 meses de suporte on-site' },
+      { path: 'processo.frete',           label: 'Frete / Logística',       ph: 'Ex.: CIF — entrega franqueada, sem ônus ao órgão' }
+    ]
+  },
+
+  servicos_dedicacao: {
+    label: 'Serviços Continuados com Dedicação Exclusiva',
+    icone: '👷',
+    fundamento: 'Lei nº 14.133/2021, arts. 6º, XV; 57, II; 121 e ss. — regime de dedicação exclusiva de mão de obra.',
+    campos: [
+      { path: 'processo.regimeExecucao',  label: 'Regime de Execução',      ph: 'Ex.: Empreitada por preço unitário' },
+      { path: 'processo.convencaoColetiva', label: 'Convenção Coletiva Aplicável', ph: 'Ex.: CCT SINDLIMP/SP 2025' },
+      { path: 'processo.produtividade',   label: 'Produtividade / Postos',  ph: 'Ex.: 4 postos de 44h semanais' },
+      { path: 'processo.planilhaCustos',  label: 'Planilha de Custos',      ph: 'Ex.: Anexo I — planilha referencial com BDI e encargos' },
+      { path: 'processo.reajuste',        label: 'Reajuste / Repactuação',  ph: 'Ex.: Repactuação anual vinculada ao ACT (art. 135)' },
+      { path: 'processo.transicaoContratual', label: 'Transição Contratual', ph: 'Ex.: 30 dias de transição sem interrupção dos serviços' }
+    ]
+  },
+
+  obras_engenharia: {
+    label: 'Obras e Serviços de Engenharia',
+    icone: '🏗️',
+    fundamento: 'Lei nº 14.133/2021, arts. 6º, XXI; 45 a 49 — regime de execução e matriz de riscos obrigatória.',
+    campos: [
+      { path: 'processo.art',             label: 'ART / RRT',               ph: 'Ex.: ART CREA-SP nº 0000000' },
+      { path: 'processo.bdi',             label: 'BDI Adotado',             ph: 'Ex.: 22,45% (Acórdão TCU 2622/2013)' },
+      { path: 'processo.cronogramaFisico', label: 'Cronograma Físico-Financeiro', ph: 'Ex.: Anexo II — 4 etapas em 180 dias' },
+      { path: 'processo.matrizRiscos',    label: 'Matriz de Riscos',        ph: 'Ex.: Anexo III — alocação de riscos art. 22, §3º' },
+      { path: 'processo.medicoes',        label: 'Medições / Boletim',      ph: 'Ex.: Medição mensal conforme art. 140' },
+      { path: 'processo.crea',            label: 'Registro no CREA/CAU',    ph: 'Ex.: Matrícula CEI nº ...' }
+    ]
+  },
+
+  dispensa_inexig: {
+    label: 'Dispensa / Inexigibilidade de Licitação',
+    icone: '⚖️',
+    fundamento: 'Lei nº 14.133/2021, arts. 74 e 75 — contratação direta com instrução processual obrigatória.',
+    campos: [
+      { path: 'processo.fundamentoLegal', label: 'Fundamento Legal',        tipo: 'select',
+        opcoes: [
+          'Art. 75, I — baixo valor (obras e engenharia)',
+          'Art. 75, II — baixo valor (outros bens e serviços)',
+          'Art. 75, III — emergência ou calamidade',
+          'Art. 75, IV — licitação deserta/fracassada',
+          'Art. 74, I — fornecedor exclusivo',
+          'Art. 74, II — notória especialização',
+          'Art. 74, III — profissional do setor artístico',
+          'Outro fundamento legal'
+        ] },
+      { path: 'processo.razaoEscolha',    label: 'Razão da Escolha do Fornecedor', ph: 'Justificativa objetiva da escolha' },
+      { path: 'processo.pesquisaPrecos',  label: 'Pesquisa de Preços',      ph: 'Ex.: 3 orçamentos + Painel de Preços + IN 65/2021' },
+      { path: 'processo.ratificacao',     label: 'Ratificação',             ph: 'Ex.: Ratificado pela autoridade competente em 00/00/2025' },
+      { path: 'processo.contratacaoDireta', label: 'Observância do art. 72', ph: 'Ex.: Instrução com ETP, estimativa, parecer jurídico e autorização' }
+    ]
+  }
+};
+
+
+/* ============================================================
+   MÓDULO 2 — ESTADO DA APLICAÇÃO
+   ============================================================ */
+const REGRAS_EXEMPLO = [
+  {
+    id: uid('regra'),
+    titulo: 'UNITAU — Vedação à cobrança de frete/entrega',
+    tipo: 'nao_contem',
+    alvo: 'full',
+    valor: 'cobrança de frete',
+    severidade: 'critico',
+    fundamento: 'Norma Interna UNITAU nº 12/2023, art. 4º',
+    mensagem: 'O órgão não admite qualquer cobrança de frete ou taxa de entrega. O transporte deve ser por conta da contratada.',
+    ativa: true
+  },
+  {
+    id: uid('regra'),
+    titulo: 'UNITAU — Cláusula de isenção total de frete obrigatória',
+    tipo: 'contem',
+    alvo: 'full',
+    valor: 'isenção de frete',
+    severidade: 'alerta',
+    fundamento: 'Norma Interna UNITAU nº 12/2023, art. 4º, parágrafo único',
+    mensagem: 'Inserir expressamente a cláusula de isenção total de taxas de frete/entrega (CIF).',
+    ativa: true
+  },
+  {
+    id: uid('regra'),
+    titulo: 'UNITAU — Prazo de pagamento mínimo de 30 dias',
+    tipo: 'regex',
+    alvo: 'processo.pagamento',
+    valor: '(pagamento|quitação)\\s+(em|no prazo de)\\s+(10|15|20)\\s+dias',
+    severidade: 'alerta',
+    fundamento: 'Norma Interna UNITAU nº 08/2022, art. 2º',
+    mensagem: 'O órgão adota prazo mínimo de 30 dias para pagamento. Prazos inferiores exigem autorização da Procuradoria.',
+    ativa: true
+  }
+];
+
+const state = {
+  meta: { versao: '1.0.0', criadoEm: new Date().toISOString() },
+
+  orgao: { nome: '', cnpj: '', unidade: '', responsavel: '', cargo: '', logoDataUrl: null },
+
+  regras: JSON.parse(JSON.stringify(REGRAS_EXEMPLO)),
+
+  processo: {
+    numero: '', tipo: 'bens_comuns', modalidade: 'Pregão Eletrônico', regime: '',
+    objeto: '', justificativa: '', especificacoes: '', dotacao: '',
+    vigencia: '', prazoExecucao: '', cronograma: '',
+    modeloGestao: '', modeloExecucao: '', pagamento: '', garantia: '',
+    sancoes: '', sustentabilidade: '', lgpd: '', observacoes: ''
+  },
+
+  equipe: { gestor: '', fiscalTecnico: '', fiscalAdministrativo: '' },
+
+  itens: []
+};
+
+
+/* ============================================================
+   MÓDULO 3 — LOGO DINÂMICO (FALLBACK OmniLicit.png)
+   ============================================================ */
+const LogoManager = (() => {
+  const FALLBACK = 'OmniLicit.png';
+
+  const apply = () => {
+    const src = state.orgao.logoDataUrl || FALLBACK;
+
+    $$('[data-logo]').forEach(img => {
+      img.onerror = function () { this.onerror = null; this.src = FALLBACK; };
+      img.src = src;
+    });
+
+    const preview = $('#logoPreview');
+    if (preview) {
+      preview.onerror = function () { this.onerror = null; this.src = FALLBACK; };
+      preview.src = src;
+    }
+
+    // Favicon dinâmico
+    const fav = $('#favicon');
+    if (fav) fav.href = src;
+  };
+
+  const bind = () => {
+    $('#logoInput')?.addEventListener('change', async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        alert('A imagem deve ter no máximo 2 MB.');
+        e.target.value = '';
+        return;
+      }
+      state.orgao.logoDataUrl = await fileToDataUrl(file);
+      apply();
+      Audit.schedule();
+    });
+
+    $('#btnLogoReset')?.addEventListener('click', () => {
+      state.orgao.logoDataUrl = null;
+      const input = $('#logoInput');
+      if (input) input.value = '';
+      apply();
+    });
+  };
+
+  return { apply, bind, FALLBACK };
+})();
+
+
+/* ============================================================
+   MÓDULO 4 — COLETA DE TEXTO E MOTOR DE AUDITORIA
+   ============================================================ */
+const Audit = (() => {
+  const CAMPOS_TEXTO = [
+    'objeto', 'justificativa', 'especificacoes', 'modeloExecucao', 'modeloGestao',
+    'pagamento', 'garantia', 'sancoes', 'sustentabilidade', 'lgpd',
+    'observacoes', 'cronograma', 'frete', 'reajuste', 'transicaoContratual',
+    'matrizRiscos', 'pesquisaPrecos', 'razaoEscolha', 'contratacaoDireta'
+  ];
+
+  const collectFullText = () => {
+    const p = state.processo;
+    const partes = CAMPOS_TEXTO.map(k => p[k]).filter(Boolean);
+    state.itens.forEach(i => { if (i.descricao) partes.push(i.descricao); });
+    return partes.join('\n');
+  };
+
+  /* ---- Regras nativas da Lei nº 14.133/2021 ---- */
+  const NATIVAS = [
+    {
+      id: 'n-objeto',
+      test: () => !state.processo.objeto.trim() || state.processo.objeto.trim().length < 20,
+      issue: { severidade: 'critico', titulo: 'Objeto da contratação não definido',
+        mensagem: 'O objeto deve ser descrito de forma precisa, suficiente e clara (art. 6º, XXIII e art. 40, I).',
+        fundamento: 'Lei nº 14.133/2021, art. 40, I', alvo: 'processo.objeto' }
+    },
+    {
+      id: 'n-justificativa',
+      test: () => state.processo.justificativa.trim().length < 80,
+      issue: { severidade: 'alerta', titulo: 'Justificativa insuficiente',
+        mensagem: 'A motivação deve demonstrar o problema público e o nexo causal com a contratação (art. 18, §1º, I).',
+        fundamento: 'Lei nº 14.133/2021, art. 18, §1º, I', alvo: 'processo.justificativa' }
+    },
+    {
+      id: 'n-dotacao',
+      test: () => !state.processo.dotacao.trim(),
+      issue: { severidade: 'critico', titulo: 'Dotação orçamentária não informada',
+        mensagem: 'É obrigatória a indicação da dotação orçamentária e do recurso financeiro (art. 18, §1º, VI).',
+        fundamento: 'Lei nº 14.133/2021, art. 18, §1º, VI', alvo: 'processo.dotacao' }
+    },
+    {
+      id: 'n-itens',
+      test: () => state.itens.length === 0,
+      issue: { severidade: 'critico', titulo: 'Nenhum item/quantitativo especificado',
+        mensagem: 'O TR deve conter a quantidade e a estimativa do valor de cada item (art. 40, IV e VI).',
+        fundamento: 'Lei nº 14.133/2021, art. 40, IV', alvo: 'itens' }
+    },
+    {
+      id: 'n-itens-sem-valor',
+      test: () => state.itens.length > 0 && state.itens.some(i => toNumber(i.valorUnit) <= 0),
+      issue: { severidade: 'alerta', titulo: 'Itens sem valor unitário estimado',
+        mensagem: 'A estimativa de preços deve ser apurada previamente (art. 23) e registrada por item.',
+        fundamento: 'Lei nº 14.133/2021, art. 23', alvo: 'itens' }
+    },
+    {
+      id: 'n-prazo',
+      test: () => !state.processo.vigencia.trim(),
+      issue: { severidade: 'alerta', titulo: 'Prazo de vigência não definido',
+        mensagem: 'Informar o prazo de vigência contratual e, se for o caso, sua prorrogação (art. 105 e ss.).',
+        fundamento: 'Lei nº 14.133/2021, art. 105', alvo: 'processo.vigencia' }
+    },
+    {
+      id: 'n-fiscalizacao',
+      test: () => !state.equipe.gestor.trim() && !state.equipe.fiscalTecnico.trim(),
+      issue: { severidade: 'alerta', titulo: 'Equipe de fiscalização não designada',
+        mensagem: 'O TR deve indicar o gestor e os fiscais do contrato (art. 40, §1º e art. 117).',
+        fundamento: 'Lei nº 14.133/2021, art. 117', alvo: 'equipe.gestor' }
+    },
+    {
+      id: 'n-pagamento',
+      test: () => !state.processo.pagamento.trim(),
+      issue: { severidade: 'alerta', titulo: 'Condições de pagamento ausentes',
+        mensagem: 'Definir prazo, forma e critérios de pagamento, respeitada a ordem cronológica (art. 92, V e art. 141).',
+        fundamento: 'Lei nº 14.133/2021, art. 92, V', alvo: 'processo.pagamento' }
+    },
+    {
+      id: 'n-sancoes',
+      test: () => !state.processo.sancoes.trim(),
+      issue: { severidade: 'info', titulo: 'Sanções administrativas não detalhadas',
+        mensagem: 'Recomenda-se detalhar as infrações e sanções (arts. 155 a 163).',
+        fundamento: 'Lei nº 14.133/2021, arts. 155-163', alvo: 'processo.sancoes' }
+    },
+    {
+      id: 'n-sustentabilidade',
+      test: () => !state.processo.sustentabilidade.trim(),
+      issue: { severidade: 'info', titulo: 'Critérios de sustentabilidade não previstos',
+        mensagem: 'A contratação deve observar critérios de sustentabilidade ambiental (art. 5º e art. 40, X).',
+        fundamento: 'Lei nº 14.133/2021, art. 5º', alvo: 'processo.sustentabilidade' }
+    },
+    {
+      id: 'n-lgpd',
+      test: () => !state.processo.lgpd.trim(),
+      issue: { severidade: 'info', titulo: 'Cláusula de proteção de dados (LGPD) ausente',
+        mensagem: 'Recomenda-se prever o tratamento de dados pessoais conforme a Lei nº 13.709/2018.',
+        fundamento: 'Lei nº 13.709/2018 (LGPD)', alvo: 'processo.lgpd' }
+    },
+    {
+      id: 'n-obras-matriz',
+      test: () => state.processo.tipo === 'obras_engenharia' && !String(state.processo.matrizRiscos || '').trim(),
+      issue: { severidade: 'critico', titulo: 'Matriz de riscos ausente (obras e engenharia)',
+        mensagem: 'Nas contratações de obras e serviços de engenharia é obrigatória a matriz de alocação de riscos.',
+        fundamento: 'Lei nº 14.133/2021, art. 22, §3º e art. 103', alvo: 'processo.matrizRiscos' }
+    },
+    {
+      id: 'n-dedicacao-cct',
+      test: () => state.processo.tipo === 'servicos_dedicacao' &&
+                   !String(state.processo.convencaoColetiva || '').trim(),
+      issue: { severidade: 'alerta', titulo: 'Convenção coletiva não indicada (dedicação exclusiva)',
+        mensagem: 'Indicar a CCT aplicável e os custos de mão de obra com repactuação vinculada ao ACT.',
+        fundamento: 'Lei nº 14.133/2021, art. 121 e ss.', alvo: 'processo.convencaoColetiva' }
+    },
+    {
+      id: 'n-dispensa-fundamento',
+      test: () => state.processo.tipo === 'dispensa_inexig' &&
+                   !String(state.processo.fundamentoLegal || '').trim(),
+      issue: { severidade: 'critico', titulo: 'Fundamento legal da contratação direta ausente',
+        mensagem: 'A contratação direta exige enquadramento expresso em hipótese legal (arts. 74 e 75).',
+        fundamento: 'Lei nº 14.133/2021, arts. 74 e 75', alvo: 'processo.fundamentoLegal' }
+    },
+    {
+      id: 'n-dispensa-precos',
+      test: () => state.processo.tipo === 'dispensa_inexig' &&
+                   !String(state.processo.pesquisaPrecos || '').trim(),
+      issue: { severidade: 'alerta', titulo: 'Pesquisa de preços não informada',
+        mensagem: 'A instrução do processo de contratação direta exige estimativa de preços (art. 72, II).',
+        fundamento: 'Lei nº 14.133/2021, art. 72, II', alvo: 'processo.pesquisaPrecos' }
+    },
+    {
+      id: 'n-frete',
+      test: () => /frete/i.test(collectFullText()) &&
+                   !/isen[çc][ãa]o\s+de\s+frete|frete\s+(por\s+conta|a\s+cargo)/i.test(collectFullText()),
+      issue: { severidade: 'info', titulo: 'Menção a frete sem definição de responsabilidade',
+        mensagem: 'Especifique expressamente de quem é o ônus do frete (CIF/FOB) para evitar ambiguidade.',
+        fundamento: 'Boas práticas de especificação', alvo: 'processo.objeto' }
+    }
+  ];
+
+  const run = () => {
+    const issues = [];
+    const fullText = collectFullText();
+    const lowerFull = fullText.toLowerCase();
+
+    /* --- Regras institucionais do órgão --- */
+    state.regras.filter(r => r.ativa).forEach(r => {
+      const rawTarget = r.alvo === 'full' ? fullText : String(getPath(state, r.alvo) ?? '');
+      const hay = rawTarget.toLowerCase();
+      const needle = String(r.valor || '').toLowerCase();
+      let violado = false, detalhe = '';
+
+      switch (r.tipo) {
+        case 'contem':
+          violado = !!needle && !hay.includes(needle);
+          detalhe = violado ? `Cláusula exigida ausente: "${r.valor}"` : '';
+          break;
+        case 'nao_contem':
+          violado = !!needle && hay.includes(needle);
+          detalhe = violado ? `Termo vedado encontrado: "${r.valor}"` : '';
+          break;
+        case 'regex':
+          try { violado = !!r.valor && new RegExp(r.valor, 'i').test(rawTarget); } catch (_) { violado = false; }
+          detalhe = violado ? `Padrão vedado identificado: /${r.valor}/i` : '';
+          break;
+        case 'campo_vazio':
+          violado = !rawTarget.trim();
+          detalhe = violado ? 'Campo obrigatório pela norma interna não preenchido' : '';
+          break;
+      }
+
+      if (violado) {
+        issues.push({
+          origem: 'Institucional',
+          severidade: r.severidade,
+          titulo: r.titulo,
+          mensagem: r.mensagem || detalhe,
+          detalhe,
+          fundamento: r.fundamento || 'Norma interna do órgão',
+          alvo: r.alvo
+        });
+      }
+    });
+
+    /* --- Regras nativas da Lei 14.133/2021 --- */
+    NATIVAS.forEach(n => {
+      try { if (n.test()) issues.push({ origem: 'Lei nº 14.133/2021', ...n.issue }); }
+      catch (_) { /* ignora */ }
+    });
+
+    /* --- Ordenação por severidade --- */
+    const peso = { critico: 0, alerta: 1, info: 2 };
+    issues.sort((a, b) => (peso[a.severidade] ?? 3) - (peso[b.severidade] ?? 3));
+
+    return issues;
+  };
+
+  /* ---- Renderização do painel ---- */
+  const SEV_CLASS = { critico: 'sev-critico', alerta: 'sev-alerta', info: 'sev-info' };
+  const SEV_LABEL = { critico: 'Crítico', alerta: 'Alerta', info: 'Info' };
+
+  const render = () => {
+    const issues = run();
+    const count = { critico: 0, alerta: 0, info: 0 };
+    issues.forEach(i => { count[i.severidade] = (count[i.severidade] || 0) + 1; });
+
+    $('#cntCritico').textContent = count.critico;
+    $('#cntAlerta').textContent  = count.alerta;
+    $('#cntInfo').textContent    = count.info;
+    $('#auditTotal').textContent = issues.length;
+
+    const score = Math.max(0, 100 - count.critico * 12 - count.alerta * 6 - count.info * 2);
+    const scoreEl = $('#auditScore');
+    const barEl = $('#auditBar');
+    scoreEl.textContent = score + '%';
+    scoreEl.className = 'badge ' + (score >= 85 ? 'sev-ok' : score >= 60 ? 'sev-alerta' : 'sev-critico');
+    barEl.style.width = score + '%';
+    barEl.className = 'h-full transition-all duration-300 ' +
+      (score >= 85 ? 'bg-emerald-500' : score >= 60 ? 'bg-amber-500' : 'bg-red-500');
+
+    const list = $('#auditList');
+    if (!issues.length) {
+      list.innerHTML = `
+        <div class="p-6 text-center">
+          <p class="text-3xl">✅</p>
+          <p class="text-sm font-semibold text-emerald-600 mt-2">Nenhuma inconformidade detectada</p>
+          <p class="text-[11px] text-slate-400 mt-1">O TR está aderente às regras institucionais e à Lei nº 14.133/2021.</p>
+        </div>`;
+      return issues;
+    }
+
+    list.innerHTML = issues.map(i => `
+      <div class="p-3 hover:bg-slate-50 transition cursor-pointer" data-goto="${escapeHtml(i.alvo || '')}">
+        <div class="flex items-start gap-2">
+          <span class="badge ${SEV_CLASS[i.severidade] || 'sev-info'} mt-0.5">${SEV_LABEL[i.severidade] || 'Info'}</span>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-semibold text-slate-700 leading-snug">${escapeHtml(i.titulo)}</p>
+            <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">${escapeHtml(i.mensagem || '')}</p>
+            <p class="text-[10px] text-slate-400 mt-1 italic">${escapeHtml(i.fundamento || '')}</p>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    return issues;
+  };
+
+  /* Navegação: clicar no apontamento leva ao campo */
+  const bindNavigation = () => {
+    $('#auditList')?.addEventListener('click', (e) => {
+      const card = e.target.closest('[data-goto]');
+      if (!card) return;
+      const alvo = card.dataset.goto;
+      if (!alvo || alvo === 'itens') {
+        $('#itensBody')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      const input = document.querySelector(`[data-bind="${alvo}"]`);
+      if (input) {
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        input.focus({ preventScroll: true });
+        input.classList.add('ring-2', 'ring-brand-400');
+        setTimeout(() => input.classList.remove('ring-2', 'ring-brand-400'), 1400);
+      }
+    });
+  };
+
+  const schedule = debounce(() => { render(); Trace.schedule(); }, 240);
+
+  return { run, render, schedule, bindNavigation, collectFullText };
+})();
+
+
+/* ============================================================
+   MÓDULO 5 — RASTREABILIDADE (SELO + SHA-256)
+   ============================================================ */
+const Trace = (() => {
+  let current = { hash: '', tag: '', selo: 'OMNILICIT::TR::—::—', timestamp: new Date().toISOString() };
+
+  /** Estado "assinável": exclui o logo (binário) para manter o hash estável e enxuto */
+  const snapshotForHash = () => ({
+    orgao: { nome: state.orgao.nome, cnpj: state.orgao.cnpj, unidade: state.orgao.unidade },
+    processo: state.processo,
+    equipe: state.equipe,
+    itens: state.itens,
+    regras: state.regras.filter(r => r.ativa).map(r => ({
+      titulo: r.titulo, tipo: r.tipo, alvo: r.alvo, valor: r.valor, severidade: r.severidade
+    })),
+    meta: { versao: state.meta.versao }
+  });
+
+  const compute = async () => {
+    const canonical = canonicalize(snapshotForHash());
+    const hash = await sha256Hex(canonical);
+    const ano = new Date().getFullYear();
+    const tag = `TR-${ano}-${hash.slice(0, 8).toUpperCase()}`;
+    current = {
+      hash, tag, ano,
+      selo: `OMNILICIT::TR::${tag}::${ano}`,
+      timestamp: new Date().toISOString()
+    };
+    return current;
+  };
+
+  const render = () => {
+    $('#traceSelo').textContent = current.selo;
+    $('#traceHash').textContent = current.hash || 'aguardando conteúdo…';
+    $('#traceTs').textContent = new Date(current.timestamp).toLocaleString('pt-BR');
+    $('#seloPreview').textContent = current.selo;
+  };
+
+  const refresh = async () => { await compute(); render(); return current; };
+  const get = () => current;
+  const schedule = debounce(() => { refresh(); }, 600);
+
+  return { compute, refresh, render, get, schedule };
+})();
+
+
+/* ============================================================
+   MÓDULO 6 — RENDERIZAÇÃO DE UI (tipos, itens, regras)
+   ============================================================ */
+const UI = (() => {
+
+  /* ---------- Seletor de tipo de processo ---------- */
+  const renderTipoSelector = () => {
+    const box = $('#tipoSelector');
+    box.innerHTML = Object.entries(TIPOS_PROCESSO).map(([key, t]) => {
+      const active = state.processo.tipo === key;
+      return `
+        <button type="button" data-tipo="${key}"
+          class="text-left rounded-lg border p-3 transition
+                 ${active ? 'border-brand-600 bg-brand-50 ring-1 ring-brand-500'
+                          : 'border-slate-200 bg-white hover:border-brand-300 hover:bg-slate-50'}">
+          <span class="text-lg">${t.icone}</span>
+          <p class="text-[11px] font-bold text-slate-700 mt-1 leading-tight">${t.label}</p>
+        </button>`;
+    }).join('');
+
+    box.querySelectorAll('[data-tipo]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.processo.tipo = btn.dataset.tipo;
+        renderTipoSelector();
+        renderCamposDinamicos();
+        Audit.schedule();
+      });
+    });
+  };
+
+  /* ---------- Campos dinâmicos por tipo ---------- */
+  const renderCamposDinamicos = () => {
+    const tipo = TIPOS_PROCESSO[state.processo.tipo];
+    $('#tipoFundamento').textContent = tipo.fundamento;
+
+    const box = $('#camposDinamicos');
+    box.innerHTML = tipo.campos.map(c => {
+      const v = getPath(state, c.path) ?? '';
+      if (c.tipo === 'select') {
+        return `
+          <label class="block">
+            <span class="lbl">${escapeHtml(c.label)}</span>
+            <select class="inp" data-bind="${c.path}">
+              <option value="">— selecione —</option>
+              ${c.opcoes.map(o => `<option value="${escapeHtml(o)}" ${o === v ? 'selected' : ''}>${escapeHtml(o)}</option>`).join('')}
+            </select>
+          </label>`;
+      }
+      return `
+        <label class="block">
+          <span class="lbl">${escapeHtml(c.label)}</span>
+          <input class="inp" data-bind="${c.path}" value="${escapeHtml(v)}" placeholder="${escapeHtml(c.ph || '')}" />
+        </label>`;
+    }).join('');
+  };
+
+  /* ---------- Tabela de itens ---------- */
+  const renderItens = () => {
+    const tb = $('#itensBody');
+    $('#itensBadge').textContent = `${state.itens.length} ${state.itens.length === 1 ? 'item' : 'itens'}`;
+
+    if (!state.itens.length) {
+      tb.innerHTML = `<tr><td colspan="7" class="text-center text-slate-400 py-8 text-xs">
+        Nenhum item cadastrado. Clique em “Adicionar item” ou importe do LicitaReq / LicitaETP.
+      </td></tr>`;
+      updateTotais();
+      return;
+    }
+
+    tb.innerHTML = state.itens.map((it, i) => {
+      const total = toNumber(it.quantidade) * toNumber(it.valorUnit);
+      return `
+        <tr class="hover:bg-slate-50/70">
+          <td class="px-3 py-1.5 text-center text-slate-400 font-mono text-[11px]">${i + 1}</td>
+          <td class="px-2 py-1.5">
+            <input class="inp-sm" data-item="${i}" data-field="descricao"
+                   value="${escapeHtml(it.descricao || '')}" placeholder="Descrição do item" />
+          </td>
+          <td class="px-2 py-1.5">
+            <input class="inp-sm text-center" data-item="${i}" data-field="unidade"
+                   value="${escapeHtml(it.unidade || '')}" placeholder="UN" />
+          </td>
+          <td class="px-2 py-1.5">
+            <input class="inp-sm text-right" data-item="${i}" data-field="quantidade" inputmode="decimal"
+                   value="${escapeHtml(it.quantidade || '')}" placeholder="0" />
+          </td>
+          <td class="px-2 py-1.5">
+            <input class="inp-sm text-right" data-item="${i}" data-field="valorUnit" inputmode="decimal"
+                   value="${escapeHtml(it.valorUnit || '')}" placeholder="0,00" />
+          </td>
+          <td class="px-3 py-1.5 text-right font-semibold text-slate-600 tabular-nums"
+              data-total-row="${i}">${formatBRL(total)}</td>
+          <td class="px-1 text-center">
+            <button class="text-slate-300 hover:text-red-500 transition text-sm"
+                    data-item-del="${i}" title="Remover item">✕</button>
+          </td>
+        </tr>`;
+    }).join('');
+
+    updateTotais();
+  };
+
+  const updateTotais = () => {
+    let global = 0;
+    state.itens.forEach((it, i) => {
+      const total = toNumber(it.quantidade) * toNumber(it.valorUnit);
+      global += total;
+      const cell = document.querySelector(`[data-total-row="${i}"]`);
+      if (cell) cell.textContent = formatBRL(total);
+    });
+    $('#valorGlobal').textContent = formatBRL(global);
+  };
+
+  /* ---------- Lista de regras institucionais ---------- */
+  const SEV_CLASS = { critico: 'sev-critico', alerta: 'sev-alerta', info: 'sev-info' };
+
+  const renderRegras = () => {
+    $('#regrasCount').textContent = state.regras.length;
+    const box = $('#regrasList');
+
+    if (!state.regras.length) {
+      box.innerHTML = `<p class="text-xs text-slate-400 italic py-2">
+        Nenhuma regra institucional cadastrada. Clique em “Carregar exemplos (UNITAU)” ou adicione manualmente.</p>`;
+      return;
+    }
+
+    box.innerHTML = state.regras.map((r, i) => `
+      <div class="flex items-start gap-3 p-3 rounded-lg border transition
+                  ${r.ativa ? 'border-slate-200 bg-white' : 'border-slate-200 bg-slate-50 opacity-60'}">
+        <input type="checkbox" data-regra-ativa="${i}" ${r.ativa ? 'checked' : ''}
+               class="mt-1 w-4 h-4 accent-brand-700 cursor-pointer" />
+        <div class="min-w-0 flex-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="badge ${SEV_CLASS[r.severidade] || 'sev-info'}">${r.severidade}</span>
+            <p class="text-xs font-semibold text-slate-700 truncate">${escapeHtml(r.titulo)}</p>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">${escapeHtml(r.mensagem || '')}</p>
+          <code class="text-[10px] text-slate-400 mt-1 block">
+            ${escapeHtml(r.tipo)} · ${escapeHtml(r.alvo)} · ${escapeHtml(r.valor || '—')}
+            ${r.fundamento ? ' · ' + escapeHtml(r.fundamento) : ''}
+          </code>
+        </div>
+        <button class="text-slate-300 hover:text-red-500 transition text-sm" data-regra-del="${i}" title="Remover">✕</button>
+      </div>
+    `).join('');
+  };
+
+  /* ---------- Bind global de inputs (delegação) ---------- */
+  const bindGlobalInputs = () => {
+    const handler = (e) => {
+      const t = e.target;
+
+      /* Inputs data-bind */
+      const bind = t.dataset?.bind;
+      if (bind) {
+        const value = t.type === 'checkbox' ? t.checked : t.value;
+        setPath(state, bind, value);
+        if (bind === 'orgao.nome') $('#hdrOrgao').textContent = value || 'Órgão não informado';
+        Audit.schedule();
+        return;
+      }
+
+      /* Inputs da tabela de itens */
+      const idx = t.dataset?.item;
+      if (idx !== undefined && t.dataset.field) {
+        state.itens[Number(idx)][t.dataset.field] = t.value;
+        if (t.dataset.field === 'quantidade' || t.dataset.field === 'valorUnit') updateTotais();
+        Audit.schedule();
+      }
+    };
+
+    document.addEventListener('input', handler);
+    document.addEventListener('change', handler);
+  };
+
+  /* ---------- Eventos de UI ---------- */
+  const bindEvents = () => {
+    /* Itens */
+    $('#btnAddItem')?.addEventListener('click', () => {
+      state.itens.push({ id: uid('item'), descricao: '', unidade: 'UN', quantidade: '', valorUnit: '' });
+      renderItens();
+      Audit.schedule();
+    });
+
+    $('#btnClearItens')?.addEventListener('click', () => {
+      if (!state.itens.length) return;
+      if (!confirm('Remover todos os itens?')) return;
+      state.itens = [];
+      renderItens();
+      Audit.schedule();
+    });
+
+    $('#itensBody')?.addEventListener('click', (e) => {
+      const del = e.target.closest('[data-item-del]');
+      if (!del) return;
+      state.itens.splice(Number(del.dataset.itemDel), 1);
+      renderItens();
+      Audit.schedule();
+    });
+
+    /* Regras */
+    $('#formRegra')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const valor = String(fd.get('valor') || '').trim();
+
+      state.regras.push({
+        id: uid('regra'),
+        titulo: String(fd.get('titulo') || '').trim(),
+        tipo: fd.get('tipo'),
+        alvo: fd.get('alvo'),
+        valor,
+        severidade: fd.get('severidade'),
+        fundamento: String(fd.get('fundamento') || '').trim(),
+        mensagem: `Regra institucional ativa — verificação do tipo "${fd.get('tipo')}" sobre "${fd.get('alvo')}".`,
+        ativa: true
+      });
+
+      e.target.reset();
+      renderRegras();
+      Audit.schedule();
+    });
+
+    $('#btnRegrasExemplo')?.addEventListener('click', () => {
+      state.regras = JSON.parse(JSON.stringify(REGRAS_EXEMPLO));
+      renderRegras();
+      Audit.schedule();
+    });
+
+    $('#btnRegrasLimpar')?.addEventListener('click', () => {
+      if (!state.regras.length) return;
+      if (!confirm('Remover todas as regras institucionais?')) return;
+      state.regras = [];
+      renderRegras();
+      Audit.schedule();
+    });
+
+    $('#regrasList')?.addEventListener('change', (e) => {
+      const i = e.target.dataset?.regraAtiva;
+      if (i === undefined) return;
+      state.regras[Number(i)].ativa = e.target.checked;
+      renderRegras();
+      Audit.schedule();
+    });
+
+    $('#regrasList')?.addEventListener('click', (e) => {
+      const del = e.target.closest('[data-regra-del]');
+      if (!del) return;
+      state.regras.splice(Number(del.dataset.regraDel), 1);
+      renderRegras();
+      Audit.schedule();
+    });
+  };
+
+  const syncBindingsFromState = () => {
+    $$('[data-bind]').forEach(inp => {
+      const v = getPath(state, inp.dataset.bind);
+      if (inp.type === 'checkbox') inp.checked = !!v;
+      else if (document.activeElement !== inp) inp.value = v ?? '';
+    });
+    $('#hdrOrgao').textContent = state.orgao.nome || 'Órgão não informado';
+  };
+
+  return {
+    renderTipoSelector, renderCamposDinamicos, renderItens, updateTotais,
+    renderRegras, bindGlobalInputs, bindEvents, syncBindingsFromState
+  };
+})();
+
+
+/* ============================================================
+   MÓDULO 7 — IMPORTAÇÃO INTELIGENTE (DFD / ETP)
+   ============================================================ */
+const Importador = (() => {
+
+  const log = (msg, tipo = 'ok') => {
+    const box = $('#importLog');
+    box.classList.remove('hidden');
+    const cores = {
+      ok: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+      warn: 'border-amber-200 bg-amber-50 text-amber-800',
+      err: 'border-red-200 bg-red-50 text-red-800'
+    };
+    box.className = `text-xs rounded-lg border p-3 whitespace-pre-wrap font-mono ${cores[tipo]}`;
+    box.textContent = msg;
+  };
+
+  /* ---------- Mapeamento flexível de chaves ---------- */
+  const pick = (obj, keys) => {
+    for (const k of keys) {
+      const partes = k.split('.');
+      let cur = obj;
+      for (const p of partes) {
+        if (cur && typeof cur === 'object' && p in cur) cur = cur[p];
+        else { cur = undefined; break; }
+      }
+      if (cur !== undefined && cur !== null && String(cur).trim() !== '') return cur;
+    }
+    return undefined;
+  };
+
+  const applyPayload = (data) => {
+    const aplicados = [];
+
+    /* Suporta payloads aninhados: { dfd: {...} } | { etp: {...} } | {...} */
+    const raiz = data.dfd || data.etp || data.documento || data;
+
+    const mapa = [
+      { path: 'processo.objeto',        keys: ['objeto', 'objetoContratacao', 'descricaoObjeto', 'demanda', 'objeto.descricao'] },
+      { path: 'processo.justificativa', keys: ['justificativa', 'motivacao', 'justificativaNecessidade', 'necessidade'] },
+      { path: 'processo.especificacoes',keys: ['especificacoes', 'especificacoesTecnicas', 'solucao', 'descricaoSolucao', 'requisitos'] },
+      { path: 'processo.dotacao',       keys: ['dotacao', 'dotacaoOrcamentaria', 'classificacaoOrcamentaria', 'fonteRecurso', 'programaTrabalho'] },
+      { path: 'processo.vigencia',      keys: ['vigencia', 'prazoVigencia', 'duracaoContrato'] },
+      { path: 'processo.prazoExecucao', keys: ['prazoExecucao', 'prazoEntrega', 'prazoExecucaoDias', 'prazo'] },
+      { path: 'processo.cronograma',    keys: ['cronograma', 'cronogramaExecucao', 'etapas'] },
+      { path: 'equipe.gestor',          keys: ['equipe.gestor', 'gestor', 'gestorContrato'] },
+      { path: 'equipe.fiscalTecnico',   keys: ['equipe.fiscalTecnico', 'fiscalTecnico', 'fiscal'] },
+      { path: 'equipe.fiscalAdministrativo', keys: ['equipe.fiscalAdministrativo', 'fiscalAdministrativo'] },
+      { path: 'orgao.nome',             keys: ['orgao.nome', 'orgao', 'unidadeAdministrativa', 'entidade'] },
+      { path: 'processo.numero',        keys: ['processo.numero', 'numeroProcesso', 'protocolo', 'id'] },
+      { path: 'processo.modalidade',    keys: ['modalidade', 'processo.modalidade'] }
+    ];
+
+    mapa.forEach(m => {
+      const v = pick(raiz, m.keys);
+      if (v !== undefined) {
+        setPath(state, m.path, typeof v === 'object' ? JSON.stringify(v) : String(v));
+        aplicados.push(m.path);
+      }
+    });
+
+    /* Itens / quantidades */
+    const itensRaw = pick(raiz, ['itens', 'quantidades', 'itensDemandados', 'produtos', 'lotes', 'objeto.itens']);
+    if (Array.isArray(itensRaw) && itensRaw.length) {
+      state.itens = itensRaw.map(i => ({
+        id: uid('item'),
+        descricao: String(pick(i, ['descricao', 'item', 'nome', 'especificacao', 'objeto']) ?? ''),
+        unidade: String(pick(i, ['unidade', 'un', 'unidadeMedida']) ?? 'UN'),
+        quantidade: String(pick(i, ['quantidade', 'qtd', 'qtde']) ?? ''),
+        valorUnit: String(pick(i, ['valorUnit', 'valorUnitario', 'precoUnitario', 'valor']) ?? '')
+      }));
+      aplicados.push(`itens (${state.itens.length})`);
+    }
+
+    /* Tipo de processo inferido */
+    const tipoHint = String(pick(raiz, ['tipo', 'tipoContratacao', 'natureza']) ?? '').toLowerCase();
+    if (tipoHint) {
+      if (/obra|engenharia/.test(tipoHint))              state.processo.tipo = 'obras_engenharia';
+      else if (/dedica|mao de obra|mão de obra|continuad/.test(tipoHint)) state.processo.tipo = 'servicos_dedicacao';
+      else if (/dispensa|inexig/.test(tipoHint))         state.processo.tipo = 'dispensa_inexig';
+      else if (/bem|aquisic|compr/.test(tipoHint))       state.processo.tipo = 'bens_comuns';
+      aplicados.push('processo.tipo');
+    }
+
+    return aplicados;
+  };
+
+  /* ---------- PDF: extração de texto + heurística ---------- */
+  const extrairTextoPdf = async (file) => {
+    if (!window.pdfjsLib) throw new Error('pdf.js não disponível neste ambiente.');
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const buffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+    let texto = '';
+    for (let p = 1; p <= pdf.numPages; p++) {
+      const page = await pdf.getPage(p);
+      const content = await page.getTextContent();
+      texto += content.items.map(it => it.str).join(' ') + '\n';
+    }
+    return texto;
+  };
+
+  const heuristicaPdf = (texto) => {
+    const g = (re) => { const m = texto.match(re); return m ? m[1].trim() : undefined; };
+    return {
+      objeto: g(/objeto[:\s]+([^\n]{15,600})/i),
+      justificativa: g(/justificativa[:\s]+([^\n]{15,800})/i),
+      dotacao: g(/(?:dota[çc][ãa]o|classifica[çc][ãa]o or[çc]ament[áa]ria)[:\s]+([^\n]{6,200})/i),
+      prazoExecucao: g(/prazo(?:\s+de\s+(?:execu[çc][ãa]o|entrega))?[:\s]+([^\n]{3,120})/i),
+      vigencia: g(/vig[êe]ncia[:\s]+([^\n]{3,120})/i),
+      modalidade: g(/modalidade[:\s]+([^\n]{3,60})/i),
+      processoNumero: g(/(?:processo|protocolo)\s*(?:n[º°o.]*)?\s*[:\s]?\s*([\d./-]{4,30})/i)
+    };
+  };
+
+  /* ---------- Processamento principal ---------- */
+  const processFile = async (file) => {
+    const nome = file.name.toLowerCase();
+    try {
+      if (nome.endsWith('.json')) {
+        const texto = await file.text();
+        const data = JSON.parse(texto);
+        const aplicados = applyPayload(data);
+        finalize(aplicados, file.name);
+        return;
+      }
+
+      if (nome.endsWith('.pdf')) {
+        log(`⏳ Lendo "${file.name}" com pdf.js…`, 'warn');
+        const texto = await extrairTextoPdf(file);
+        const dados = heuristicaPdf(texto);
+        const aplicados = applyPayload(dados);
+        finalize(aplicados, file.name);
+        return;
+      }
+
+      log(`⚠ Arquivo "${file.name}" ignorado. Formatos aceitos: .json e .pdf`, 'warn');
+    } catch (err) {
+      log(`❌ Falha ao processar "${file.name}":\n${err.message}`, 'err');
+    }
+  };
+
+  const finalize = (aplicados, nomeArquivo) => {
+    UI.syncBindingsFromState();
+    UI.renderTipoSelector();
+    UI.renderCamposDinamicos();
+    UI.renderItens();
+    Audit.schedule();
+
+    if (!aplicados.length) {
+      log(`⚠ "${nomeArquivo}" lido, mas nenhum campo reconhecido foi localizado.\n` +
+          `Verifique se o JSON segue o schema do LicitaReq / LicitaETP.`, 'warn');
+      return;
+    }
+
+    log(`✅ Importação concluída a partir de "${nomeArquivo}"\n` +
+        `Campos populados:\n  • ${aplicados.join('\n  • ')}`, 'ok');
+  };
+
+  /* ---------- Bind dropzone ---------- */
+  const bind = () => {
+    const dz = $('#dropzone');
+    const input = $('#fileImport');
+
+    dz?.addEventListener('click', () => input.click());
+
+    input?.addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files || []);
+      for (const f of files) await processFile(f);
+      input.value = '';
+    });
+
+    ['dragenter', 'dragover'].forEach(ev =>
+      dz?.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add('hot'); }));
+
+    ['dragleave', 'drop'].forEach(ev =>
+      dz?.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('hot'); }));
+
+    dz?.addEventListener('drop', async (e) => {
+      const files = Array.from(e.dataTransfer?.files || []);
+      for (const f of files) await processFile(f);
+    });
+
+    /* Demonstração */
+    $('#btnImportDemo')?.addEventListener('click', () => {
+      const demo = {
+        origem: 'LicitaReq',
+        tipo: 'bens_comuns',
+        orgao: 'Prefeitura Municipal de Taubaté',
+        numeroProcesso: '2025/000123',
+        modalidade: 'Pregão Eletrônico',
+        objeto: 'Aquisição de 120 (cento e vinte) cadeiras giratórias de escritório, com braços reguláveis e rodízios, para atender às unidades administrativas da Secretaria de Administração.',
+        justificativa: 'A substituição das cadeiras atuais se faz necessária em razão do desgaste natural e da condenação técnica de 110 unidades pelo setor de manutenção, comprometendo a ergonomia e a saúde dos servidores.',
+        dotacao: '02.001.04.122.0002.2003.33903000 — Fonte 01 — Exercício 2025',
+        prazoExecucao: '30 (trinta) dias corridos',
+        vigencia: '12 (doze) meses',
+        equipe: { gestor: 'João da Silva — Mat. 12345', fiscalTecnico: 'Maria Souza — Mat. 54321' },
+        itens: [
+          { descricao: 'Cadeira giratória ergonômica com braços reguláveis', unidade: 'UN', quantidade: 120, valorUnit: 489.90 }
+        ]
+      };
+      finalize(applyPayload(demo), 'exemplo-licitareq.json');
+    });
+  };
+
+  return { bind };
+})();
+
+
+/* ============================================================
+   MÓDULO 8 — GERADOR DE PDF (pdfMake)
+   ============================================================ */
+const PdfBuilder = (() => {
+
+  const COR_PRIMARIA = '#155d78';
+  const COR_TEXTO    = '#1e293b';
+  const COR_MUTED    = '#64748b';
+
+  const LAYOUT_TABELA = {
+    hLineWidth: (i, node) => (i === 0 || i === node.table.body.length) ? 0.9 : 0.4,
+    vLineWidth: () => 0,
+    hLineColor: (i, node) => (i === 0 || i === node.table.body.length) ? COR_PRIMARIA : '#cbd5e1',
+    paddingLeft: () => 7,
+    paddingRight: () => 7,
+    paddingTop: () => 6,
+    paddingBottom: () => 6
+  };
+
+  const STYLES = {
+    tituloDoc:  { fontSize: 16, bold: true, color: COR_PRIMARIA, alignment: 'center', margin: [0, 4, 0, 2] },
+    subtitulo:  { fontSize: 9, color: COR_MUTED, alignment: 'center', margin: [0, 0, 0, 14] },
+    h2:         { fontSize: 11, bold: true, color: '#ffffff', background: COR_PRIMARIA,
+                  margin: [0, 0, 0, 0], preserveLeadingSpaces: true },
+    body:       { fontSize: 9.5, color: COR_TEXTO, alignment: 'justify', lineHeight: 1.35, margin: [0, 4, 0, 8] },
+    rotulo:     { fontSize: 9, bold: true, color: COR_PRIMARIA },
+    valor:      { fontSize: 9.5, color: COR_TEXTO },
+    th:         { fontSize: 8.5, bold: true, color: '#ffffff', fillColor: COR_PRIMARIA },
+    td:         { fontSize: 8.5, color: COR_TEXTO },
+    pequeno:    { fontSize: 7.5, color: COR_MUTED, italics: true }
+  };
+
+  /* ---------- Helpers de conteúdo ---------- */
+  const secao = (numero, titulo) => ({
+    table: {
+      widths: ['*'],
+      body: [[{
+        text: `${numero}. ${titulo.toUpperCase()}`,
+        fontSize: 10.5, bold: true, color: '#ffffff',
+        margin: [8, 5, 8, 5]
+      }]]
+    },
+    layout: 'noBorders',
+    fillColor: COR_PRIMARIA,
+    margin: [0, 12, 0, 6],
+    unbreakable: true
+  });
+
+  const paragrafo = (txt) => ({
+    text: (txt && String(txt).trim()) ? String(txt).trim() : 'Não informado.',
+    style: 'body'
+  });
+
+  const tabelaChaveValor = (pares) => ({
+    table: {
+      widths: ['32%', '*'],
+      body: pares.map(([k, v]) => ([
+        { text: k, style: 'rotulo', fillColor: '#f1f5f9' },
+        { text: (v && String(v).trim()) ? String(v).trim() : '—', style: 'valor' }
+      ]))
+    },
+    layout: LAYOUT_TABELA,
+    margin: [0, 0, 0, 8]
+  });
+
+  /* ---------- Construtor do documento ---------- */
+  const build = async (issues, trace) => {
+    const p = state.processo;
+    const tipo = TIPOS_PROCESSO[p.tipo];
+    const dataEmissao = new Date().toLocaleString('pt-BR');
+
+    /* Logo em dataURL (para embutir no PDF) */
+    const logoDataUrl = state.orgao.logoDataUrl || await srcToDataUrl(LogoManager.FALLBACK);
+
+    const content = [];
+
+    /* ── CAPA / IDENTIFICAÇÃO ── */
+    content.push({
+      columns: [
+        logoDataUrl
+          ? { image: logoDataUrl, width: 52, margin: [0, 0, 12, 0] }
+          : { text: '', width: 0 },
+        {
+          stack: [
+            { text: state.orgao.nome || 'ÓRGÃO OU ENTIDADE PÚBLICA', fontSize: 12, bold: true, color: COR_TEXTO },
+            { text: `CNPJ: ${state.orgao.cnpj || '—'}`, fontSize: 8.5, color: COR_MUTED },
+            { text: `Unidade: ${state.orgao.unidade || '—'}`, fontSize: 8.5, color: COR_MUTED }
+          ],
+          width: '*'
+        }
+      ],
+      margin: [0, 0, 0, 16]
+    });
+
+    content.push({ text: 'TERMO DE REFERÊNCIA', style: 'tituloDoc' });
+    content.push({
+      text: `Elaborado nos termos da Lei nº 14.133, de 1º de abril de 2021 — ${tipo.label}`,
+      style: 'subtitulo'
+    });
+
+    content.push(secao(1, 'Identificação do Processo'));
+    content.push(tabelaChaveValor([
+      ['Nº do Processo', p.numero],
+      ['Tipo de Contratação', tipo.label],
+      ['Modalidade', p.modalidade],
+      ['Regime / Julgamento', p.regime],
+      ['Fundamentação', tipo.fundamento],
+      ['Data de Emissão', dataEmissao],
+      ['Autoridade Responsável', [state.orgao.responsavel, state.orgao.cargo].filter(Boolean).join(' — ')]
+    ]));
+
+    /* ── 2. OBJETO ── */
+    content.push(secao(2, 'Do Objeto'));
+    content.push(paragrafo(p.objeto));
+
+    /* ── 3. JUSTIFICATIVA ── */
+    content.push(secao(3, 'Da Justificativa e Motivação'));
+    content.push(paragrafo(p.justificativa));
+
+    /* ── 4. SOLUÇÃO E ESPECIFICAÇÕES ── */
+    content.push(secao(4, 'Da Descrição da Solução e Especificações Técnicas'));
+    content.push(paragrafo(p.especificacoes));
+
+    /* Campos dinâmicos do tipo */
+    const camposTipo = tipo.campos
+      .map(c => [c.label, getPath(state, c.path)])
+      .filter(([, v]) => v && String(v).trim());
+    if (camposTipo.length) {
+      content.push({ text: 'Requisitos específicos aplicáveis ao tipo de contratação:',
+                     style: 'pequeno', margin: [0, 2, 0, 4] });
+      content.push(tabelaChaveValor(camposTipo));
+    }
+
+    /* ── 5. ITENS E QUANTITATIVOS ── */
+    content.push(secao(5, 'Dos Itens, Quantidades e Estimativa de Valor'));
+
+    if (state.itens.length) {
+      let totalGeral = 0;
+      const body = [[
+        { text: 'Item', style: 'th', alignment: 'center' },
+        { text: 'Descrição', style: 'th' },
+        { text: 'Un.', style: 'th', alignment: 'center' },
+        { text: 'Qtd.', style: 'th', alignment: 'right' },
+        { text: 'Vl. Unitário', style: 'th', alignment: 'right' },
+        { text: 'Vl. Total', style: 'th', alignment: 'right' }
+      ]];
+
+      state.itens.forEach((it, i) => {
+        const total = toNumber(it.quantidade) * toNumber(it.valorUnit);
+        totalGeral += total;
+        body.push([
+          { text: String(i + 1), style: 'td', alignment: 'center', noWrap: true },
+          { text: it.descricao || '—', style: 'td' },
+          { text: it.unidade || 'UN', style: 'td', alignment: 'center', noWrap: true },
+          { text: formatNumber(it.quantidade), style: 'td', alignment: 'right', noWrap: true },
+          { text: formatBRL(it.valorUnit), style: 'td', alignment: 'right', noWrap: true },
+          { text: formatBRL(total), style: 'td', alignment: 'right', noWrap: true }
+        ]);
+      });
+
+      body.push([
+        { text: 'VALOR GLOBAL ESTIMADO', colSpan: 5, style: 'td', bold: true, alignment: 'right',
+          fillColor: '#eff9fb', fontSize: 9 },
+        {}, {}, {}, {},
+        { text: formatBRL(totalGeral), style: 'td', bold: true, alignment: 'right',
+          fillColor: '#eff9fb', fontSize: 9, noWrap: true }
+      ]);
+
+      content.push({
+        table: { headerRows: 1, widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto'], body, dontBreakRows: true },
+        layout: LAYOUT_TABELA,
+        margin: [0, 0, 0, 10]
+      });
+    } else {
+      content.push(paragrafo('Nenhum item especificado.'));
+    }
+
+    /* ── 6. DOTAÇÃO ── */
+    content.push(secao(6, 'Da Dotação Orçamentária'));
+    content.push(paragrafo(p.dotacao));
+
+    /* ── 7. PRAZOS ── */
+    content.push(secao(7, 'Dos Prazos, Vigência e Cronograma'));
+    content.push(tabelaChaveValor([
+      ['Prazo de Vigência', p.vigencia],
+      ['Prazo de Execução / Entrega', p.prazoExecucao]
+    ]));
+    if (p.cronograma) {
+      content.push({ text: 'Cronograma / Marcos de Execução', style: 'rotulo', margin: [0, 4, 0, 2] });
+      content.push(paragrafo(p.cronograma));
+    }
+
+    /* ── 8. MODELO DE EXECUÇÃO ── */
+    content.push(secao(8, 'Do Modelo de Execução e Obrigações'));
+    content.push(paragrafo(p.modeloExecucao));
+
+    /* ── 9. GESTÃO E FISCALIZAÇÃO ── */
+    content.push(secao(9, 'Do Modelo de Gestão e Fiscalização'));
+    content.push(tabelaChaveValor([
+      ['Gestor do Contrato', state.equipe.gestor],
+      ['Fiscal Técnico', state.equipe.fiscalTecnico],
+      ['Fiscal Administrativo', state.equipe.fiscalAdministrativo]
+    ]));
+    if (p.modeloGestao) content.push(paragrafo(p.modeloGestao));
+
+    /* ── 10. PAGAMENTO ── */
+    content.push(secao(10, 'Das Condições de Pagamento'));
+    content.push(paragrafo(p.pagamento));
+
+    /* ── 11. GARANTIA ── */
+    content.push(secao(11, 'Da Garantia Contratual'));
+    content.push(paragrafo(p.garantia));
+
+    /* ── 12. SANÇÕES ── */
+    content.push(secao(12, 'Das Sanções Administrativas'));
+    content.push(paragrafo(p.sancoes));
+
+    /* ── 13. SUSTENTABILIDADE E LGPD ── */
+    content.push(secao(13, 'Da Sustentabilidade e Proteção de Dados'));
+    content.push({ text: 'Sustentabilidade Ambiental', style: 'rotulo', margin: [0, 2, 0, 2] });
+    content.push(paragrafo(p.sustentabilidade));
+    content.push({ text: 'Proteção de Dados Pessoais (LGPD)', style: 'rotulo', margin: [0, 2, 0, 2] });
+    content.push(paragrafo(p.lgpd));
+
+    /* ── 14. DISPOSIÇÕES GERAIS ── */
+    content.push(secao(14, 'Das Disposições Gerais'));
+    content.push(paragrafo(p.observacoes));
+
+    /* ── 15. COMPLIANCE INSTITUCIONAL ── */
+    const regrasAtivas = state.regras.filter(r => r.ativa);
+    content.push(secao(15, 'Do Compliance Institucional Aplicado'));
+    if (regrasAtivas.length) {
+      content.push({
+        table: {
+          headerRows: 1,
+          widths: ['*', '18%', '20%'],
+          body: [
+            [
+              { text: 'Regra Institucional', style: 'th' },
+              { text: 'Verificação', style: 'th' },
+              { text: 'Fundamento', style: 'th' }
+            ],
+            ...regrasAtivas.map(r => ([
+              { text: r.titulo, style: 'td' },
+              { text: `${r.tipo} · ${r.alvo}`, style: 'td' },
+              { text: r.fundamento || '—', style: 'td' }
+            ]))
+          ],
+          dontBreakRows: true
+        },
+        layout: LAYOUT_TABELA,
+        margin: [0, 0, 0, 8]
+      });
+    } else {
+      content.push(paragrafo('Nenhuma regra institucional específica cadastrada para este órgão.'));
+    }
+
+    /* ── 16. MATRIZ DE RASTREABILIDADE / AUDITORIA ── */
+    content.push({
+      ...secao(16, 'Anexo — Matriz de Rastreabilidade e Auditoria'),
+      pageBreak: 'before'
+    });
+
+    content.push(tabelaChaveValor([
+      ['Selo Digital OmniLicit', trace.selo],
+      ['TAG Única', trace.tag],
+      ['Hash SHA-256 do Conteúdo', trace.hash],
+      ['Timestamp de Geração', new Date(trace.timestamp).toLocaleString('pt-BR')],
+      ['Módulo Emissor', 'LicitaTR v' + state.meta.versao],
+      ['Auditoria Cruzada', 'LicitaAudit — verificação de integridade e conformidade']
+    ]));
+
+    content.push({
+      text: 'Verificações automáticas executadas nesta emissão:',
+      style: 'rotulo', margin: [0, 6, 0, 4]
+    });
+
+    const checksBody = [[
+      { text: 'Severidade', style: 'th' },
+      { text: 'Origem', style: 'th' },
+      { text: 'Apontamento', style: 'th' },
+      { text: 'Fundamento', style: 'th' }
+    ]];
+
+    if (issues.length) {
+      issues.forEach(i => checksBody.push([
+        { text: (i.severidade || 'info').toUpperCase(), style: 'td', noWrap: true },
+        { text: i.origem || '—', style: 'td', noWrap: true },
+        { text: i.titulo || '—', style: 'td' },
+        { text: i.fundamento || '—', style: 'td' }
+      ]));
+    } else {
+      checksBody.push([
+        { text: '—', style: 'td' },
+        { text: '—', style: 'td' },
+        { text: 'Nenhuma inconformidade detectada.', style: 'td' },
+        { text: '—', style: 'td' }
+      ]);
+    }
+
+    content.push({
+      table: { headerRows: 1, widths: ['12%', '16%', '*', '28%'], body: checksBody, dontBreakRows: true },
+      layout: LAYOUT_TABELA,
+      margin: [0, 0, 0, 14]
+    });
+
+    /* ── ASSINATURAS ── */
+    content.push({
+      unbreakable: true,
+      margin: [0, 26, 0, 0],
+      columns: [
+        {
+          width: '*',
+          stack: [
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 210, y2: 0, lineWidth: 0.7, lineColor: '#334155' }] },
+            { text: state.orgao.responsavel || '_________________________', fontSize: 9, bold: true, margin: [0, 4, 0, 0] },
+            { text: state.orgao.cargo || 'Autoridade Competente', fontSize: 8, color: COR_MUTED },
+            { text: state.orgao.nome || '', fontSize: 8, color: COR_MUTED }
+          ]
+        },
+        {
+          width: '*',
+          stack: [
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 210, y2: 0, lineWidth: 0.7, lineColor: '#334155' }] },
+            { text: state.equipe.gestor || '_________________________', fontSize: 9, bold: true, margin: [0, 4, 0, 0] },
+            { text: 'Gestor do Contrato', fontSize: 8, color: COR_MUTED },
+            { text: 'Designado nos termos do art. 117 da Lei nº 14.133/2021', fontSize: 7.5, color: COR_MUTED }
+          ]
+        }
+      ]
+    });
+
+    /* ── DOCUMENTO FINAL ── */
+    return {
+      pageSize: 'A4',
+      pageMargins: [40, 62, 40, 58],
+      info: {
+        title: `Termo de Referência ${p.numero || ''}`.trim(),
+        author: state.orgao.nome || 'OmniLicit',
+        subject: p.objeto ? String(p.objeto).slice(0, 200) : 'Termo de Referência',
+        keywords: `OmniLicit, LicitaTR, Lei 14.133/2021, ${trace.tag}`,
+        creator: 'OmniLicit · LicitaTR'
+      },
+      styles: STYLES,
+      defaultStyle: { fontSize: 9.5, color: COR_TEXTO },
+
+      /* Cabeçalho fixo (todas as páginas) */
+      header: () => ({
+        margin: [40, 18, 40, 0],
+        columns: [
+          logoDataUrl
+            ? { image: logoDataUrl, width: 24, margin: [0, 0, 8, 0] }
+            : { text: '', width: 0 },
+          {
+            stack: [
+              { text: state.orgao.nome || 'OmniLicit', fontSize: 8, bold: true, color: COR_PRIMARIA },
+              { text: `TR nº ${p.numero || '—'} · ${tipo.label}`, fontSize: 7, color: COR_MUTED }
+            ],
+            width: '*'
+          },
+          { text: 'LicitaTR · OmniLicit', fontSize: 7, color: '#94a3b8', alignment: 'right', width: 'auto' }
+        ]
+      }),
+
+      /* RODAPÉ FIXO DE RASTREABILIDADE OmniLicit */
+      footer: (currentPage, pageCount) => ({
+        margin: [40, 8, 40, 0],
+        stack: [
+          { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 0.6, lineColor: '#cbd5e1' }] },
+          {
+            columns: [
+              { text: trace.selo, fontSize: 6.5, bold: true, color: COR_PRIMARIA, width: 'auto' },
+              { text: `SHA-256: ${trace.hash}`, fontSize: 5.8, color: '#475569', width: '*', alignment: 'center' }
+            ],
+            margin: [0, 5, 0, 2]
+          },
+          {
+            columns: [
+              {
+                text: `Auditoria cruzada LicitaAudit · Emitido em ${new Date(trace.timestamp).toLocaleString('pt-BR')} · ` +
+                      `${state.orgao.nome || 'OmniLicit'}`,
+                fontSize: 5.8, color: COR_MUTED, width: '*'
+              },
+              { text: `Página ${currentPage} de ${pageCount}`, fontSize: 5.8, color: COR_MUTED, alignment: 'right', width: 'auto' }
+            ]
+          }
+        ]
+      }),
+
+      content
+    };
+  };
+
+  return { build };
+})();
+
+
+/* ============================================================
+   MÓDULO 9 — PERSISTÊNCIA E AÇÕES
+   ============================================================ */
+const Actions = (() => {
+  const STORAGE_KEY = 'omnilic it.tr.rascunho.v1'.replace(' ', '');
+
+  const gerarPdf = async () => {
+    const btn = $('#btnPdf');
+    const btn2 = $('#btnPdf2');
+    [btn, btn2].forEach(b => b && (b.disabled = true));
+
+    try {
+      const issues = Audit.run();
+      const trace = await Trace.refresh();
+
+      if (issues.some(i => i.severidade === 'critico')) {
+        const prosseguir = confirm(
+          '⚠ Existem apontamentos CRÍTICOS na auditoria.\n\n' +
+          'Deseja gerar o PDF mesmo assim? (o documento registrará as pendências no Anexo de Rastreabilidade)'
+        );
+        if (!prosseguir) return;
+      }
+
+      const docDefinition = await PdfBuilder.build(issues, trace);
+
+      const nomeArquivo = `TR_${(state.processo.numero || 'sem-numero').replace(/[^\w-]/g, '')}_` +
+                          `${trace.tag}.pdf`;
+
+      pdfMake.createPdf(docDefinition).download(nomeArquivo);
+
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao gerar o PDF:\n' + err.message);
+    } finally {
+      [btn, btn2].forEach(b => b && (b.disabled = false));
+    }
+  };
+
+  const exportarPacoteAuditoria = async () => {
+    const issues = Audit.run();
+    const trace = await Trace.refresh();
+
+    const pacote = {
+      modulo: 'LicitaTR',
+      versao: state.meta.versao,
+      ecossistema: 'OmniLicit',
+      destinatario: 'LicitaAudit',
+      selo: trace.selo,
+      tag: trace.tag,
+      hash: trace.hash,
+      timestamp: trace.timestamp,
+      orgao: { nome: state.orgao.nome, cnpj: state.orgao.cnpj, unidade: state.orgao.unidade },
+      processo: {
+        numero: state.processo.numero,
+        tipo: state.processo.tipo,
+        modalidade: state.processo.modalidade,
+        objeto: state.processo.objeto
+      },
+      regrasAtivas: state.regras.filter(r => r.ativa),
+      apontamentos: issues,
+      resumo: {
+        total: issues.length,
+        criticos: issues.filter(i => i.severidade === 'critico').length,
+        alertas: issues.filter(i => i.severidade === 'alerta').length,
+        informativos: issues.filter(i => i.severidade === 'info').length
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(pacote, null, 2)], { type: 'application/json' });
+    download(blob, `LicitaAudit_${trace.tag}.json`);
+  };
+
+  const salvarRascunho = async () => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const trace = await Trace.refresh();
+      alert('✅ Rascunho salvo com sucesso.\n\nSelo: ' + trace.selo);
+    } catch (err) {
+      alert('Não foi possível salvar o rascunho: ' + err.message);
+    }
+  };
+
+  const carregarRascunho = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      Object.assign(state, data);
+      return true;
+    } catch (_) { return false; }
+  };
+
+  const bind = () => {
+    $('#btnPdf')?.addEventListener('click', gerarPdf);
+    $('#btnPdf2')?.addEventListener('click', gerarPdf);
+    $('#btnAuditoria')?.addEventListener('click', exportarPacoteAuditoria);
+    $('#btnSalvar')?.addEventListener('click', salvarRascunho);
+
+    /* Atalho Ctrl/Cmd + S */
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        salvarRascunho();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        gerarPdf();
+      }
+    });
+  };
+
+  return { bind, gerarPdf, exportarPacoteAuditoria };
+})();
+
+
+/* ============================================================
+   MÓDULO 10 — BOOTSTRAP
+   ============================================================ */
+(function init() {
+  /* 1. Logo (com fallback) */
+  LogoManager.bind();
+  LogoManager.apply();
+
+  /* 2. Estado inicial dos itens */
+  if (!state.itens.length) {
+    state.itens = [
+      { id: uid('item'), descricao: '', unidade: 'UN', quantidade: '', valorUnit: '' }
+    ];
+  }
+
+  /* 3. Renderização inicial */
+  UI.renderTipoSelector();
+  UI.renderCamposDinamicos();
+  UI.renderItens();
+  UI.renderRegras();
+  UI.syncBindingsFromState();
+
+  /* 4. Eventos */
+  UI.bindGlobalInputs();
+  UI.bindEvents();
+  Audit.bindNavigation();
+  Importador.bind();
+  Actions.bind();
+
+  /* 5. Rascunho salvo */
+  if (Actions && localStorage.getItem('omnilicit.tr.rascunho.v1')) {
+    const ok = (function () {
+      try {
+        const raw = localStorage.getItem('omnilicit.tr.rascunho.v1');
+        if (!raw) return false;
+        Object.assign(state, JSON.parse(raw));
+        return true;
+      } catch (_) { return false; }
+    })();
+
+    if (ok) {
+      LogoManager.apply();
+      UI.renderTipoSelector();
+      UI.renderCamposDinamicos();
+      UI.renderItens();
+      UI.renderRegras();
+      UI.syncBindingsFromState();
+    }
+  }
+
+  /* 6. Auditoria + rastreabilidade iniciais */
+  Audit.render();
+  Trace.refresh();
+
+  /* 7. Recálculo periódico leve do hash (a cada 30s, se houver mudanças pendentes) */
+  setInterval(() => { Trace.schedule(); }, 30000);
+
+  console.info('%cOmniLicit · LicitaTR v1.0.0', 'color:#155d78;font-weight:bold',
+               '— módulo de Termo de Referência inicializado.');
+})();
+</script>
+
+</body>
+</html>
