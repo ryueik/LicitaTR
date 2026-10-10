@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════════════════════════
    OmniLicit · LicitaTR — Módulo Termo de Referência (Lei 14.133/2021)
-   Arquitetura PDF: Capa → Corpo → Assinaturas → Autenticação
+   Arquitetura PDF: Capa → Corpo → Assinaturas (2×3 por página) → Autenticação
    ══════════════════════════════════════════════════════════════ */
 
 /* ─────────── MÓDULO 0 · UTILITÁRIOS ─────────── */
@@ -38,7 +38,6 @@ const U = (() => {
         return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('');
       }
     } catch (_) {}
-    /* Fallback determinístico para file:// sem secure context */
     let h1 = 0x811c9dc5, h2 = 0x1000193;
     for (let i = 0; i < str.length; i++) {
       const c = str.charCodeAt(i);
@@ -92,7 +91,7 @@ const { $, $$, uid, getPath, setPath, debounce, esc, num, brl, fmtNum,
         sha256, canon, download, fileToDataUrl, srcToDataUrl } = U;
 
 
-/* ─────────── MÓDULO 1 · TEMA (Dark padrão · Light alternativo) ─────────── */
+/* ─────────── MÓDULO 1 · TEMA ─────────── */
 const Theme = (() => {
   const KEY = 'omnilicit.tr.theme';
   const html = document.documentElement;
@@ -183,8 +182,15 @@ const TIPOS = {
 
 
 /* ─────────── MÓDULO 3 · ESTADO ─────────── */
+const SIG_PADRAO = () => ([
+  { id: uid('sig'), nome:'', cargo:'Fiscal Técnico Titular',  matricula:'' },
+  { id: uid('sig'), nome:'', cargo:'Fiscal Substituto',       matricula:'' },
+  { id: uid('sig'), nome:'', cargo:'Gestor do Contrato',      matricula:'' },
+  { id: uid('sig'), nome:'', cargo:'Autoridade Competente',   matricula:'' }
+]);
+
 const state = {
-  meta: { versao: '1.0.0', criadoEm: new Date().toISOString() },
+  meta: { versao: '1.1.0', criadoEm: new Date().toISOString() },
   orgao: { nome:'', cnpj:'', unidade:'', responsavel:'', cargo:'', logoDataUrl:null },
   regras: [],
   processo: {
@@ -194,17 +200,12 @@ const state = {
     modeloGestao:'', modeloExecucao:'', pagamento:'', garantia:'',
     sancoes:'', sustentabilidade:'', lgpd:'', observacoes:''
   },
-  equipe: {
-    gestor: '',
-    fiscalTecnico: '',
-    fiscalSubstituto: '',
-    fiscalAdministrativo: ''
-  },
+  signatarios: SIG_PADRAO(),
   itens: []
 };
 
 
-/* ─────────── MÓDULO 4 · LOGO DINÂMICO ─────────── */
+/* ─────────── MÓDULO 4 · LOGO ─────────── */
 const Logo = (() => {
   const FALLBACK = 'logo-omnlicit.png';
 
@@ -262,6 +263,9 @@ const Audit = (() => {
     return partes.join('\n');
   };
 
+  const signatariosValidos = () =>
+    state.signatarios.filter(s => String(s.nome || '').trim().length > 0);
+
   const NATIVAS = [
     { id:'n-objeto', test:() => !state.processo.objeto.trim() || state.processo.objeto.trim().length < 20,
       issue:{ severidade:'critico', titulo:'Objeto da contratação não definido',
@@ -287,10 +291,10 @@ const Audit = (() => {
       issue:{ severidade:'alerta', titulo:'Prazo de vigência não definido',
         mensagem:'Informar o prazo de vigência contratual e, se for o caso, sua prorrogação (art. 105 e ss.).',
         fundamento:'Lei nº 14.133/2021, art. 105', alvo:'processo.vigencia' } },
-    { id:'n-fisc', test:() => !state.equipe.gestor.trim() && !state.equipe.fiscalTecnico.trim(),
-      issue:{ severidade:'alerta', titulo:'Equipe de fiscalização não designada',
-        mensagem:'O TR deve indicar o gestor e os fiscais do contrato (art. 40, §1º e art. 117).',
-        fundamento:'Lei nº 14.133/2021, art. 117', alvo:'equipe.gestor' } },
+    { id:'n-sign', test:() => signatariosValidos().length === 0,
+      issue:{ severidade:'alerta', titulo:'Nenhum signatário designado',
+        mensagem:'O TR deve indicar os responsáveis pela assinatura (gestor, fiscais e autoridade competente).',
+        fundamento:'Lei nº 14.133/2021, art. 117', alvo:'signatarios' } },
     { id:'n-pgto', test:() => !state.processo.pagamento.trim(),
       issue:{ severidade:'alerta', titulo:'Condições de pagamento ausentes',
         mensagem:'Definir prazo, forma e critérios de pagamento, respeitada a ordem cronológica (art. 92, V e art. 141).',
@@ -333,7 +337,6 @@ const Audit = (() => {
     const issues = [];
     const full = fullText();
 
-    /* Regras institucionais */
     state.regras.filter(r => r.ativa).forEach(r => {
       const raw = r.alvo === 'full' ? full : String(getPath(state, r.alvo) ?? '');
       const hay = raw.toLowerCase();
@@ -366,7 +369,6 @@ const Audit = (() => {
       });
     });
 
-    /* Regras nativas */
     NATIVAS.forEach(n => {
       try { if (n.test()) issues.push({ origem:'Lei nº 14.133/2021', ...n.issue }); } catch (_) {}
     });
@@ -434,6 +436,10 @@ const Audit = (() => {
         $('#itensBody')?.scrollIntoView({ behavior:'smooth', block:'center' });
         return;
       }
+      if (alvo === 'signatarios') {
+        $('#signatariosList')?.scrollIntoView({ behavior:'smooth', block:'center' });
+        return;
+      }
       const inp = document.querySelector(`[data-bind="${alvo}"]`);
       if (inp) {
         inp.scrollIntoView({ behavior:'smooth', block:'center' });
@@ -445,7 +451,7 @@ const Audit = (() => {
   };
 
   const schedule = debounce(() => { render(); Trace.schedule(); }, 240);
-  return { run, render, schedule, bindNav, fullText };
+  return { run, render, schedule, bindNav, fullText, signatariosValidos };
 })();
 
 
@@ -456,7 +462,7 @@ const Trace = (() => {
   const snap = () => ({
     orgao:{ nome:state.orgao.nome, cnpj:state.orgao.cnpj, unidade:state.orgao.unidade },
     processo: state.processo,
-    equipe: state.equipe,
+    signatarios: state.signatarios,
     itens: state.itens,
     regras: state.regras.filter(r => r.ativa).map(r => ({
       titulo:r.titulo, tipo:r.tipo, alvo:r.alvo, valor:r.valor, severidade:r.severidade
@@ -490,6 +496,7 @@ const Trace = (() => {
 /* ─────────── MÓDULO 7 · UI ─────────── */
 const UI = (() => {
 
+  /* ---------- Seletor de tipo ---------- */
   const renderTipos = () => {
     const box = $('#tipoSelector');
     box.innerHTML = Object.entries(TIPOS).map(([k, t]) => `
@@ -532,6 +539,7 @@ const UI = (() => {
     }).join('');
   };
 
+  /* ---------- Itens ---------- */
   const renderItens = () => {
     const tb = $('#itensBody');
     $('#itensBadge').textContent = `${state.itens.length} ${state.itens.length === 1 ? 'item' : 'itens'}`;
@@ -576,6 +584,37 @@ const UI = (() => {
     $('#valorGlobal').textContent = brl(g);
   };
 
+  /* ---------- Signatários ---------- */
+  const renderSignatarios = () => {
+    const list  = $('#signatariosList');
+    const empty = $('#signatariosEmpty');
+    const count = $('#signatariosCount');
+
+    const total = state.signatarios.length;
+    count.textContent = total;
+
+    if (!total) {
+      list.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    list.innerHTML = state.signatarios.map((s, i) => `
+      <div class="signatario-item" data-signatario-row="${i}">
+        <span class="signatario-item__index">${i + 1}</span>
+        <input class="input" data-signatario="${i}" data-field="nome"
+               value="${esc(s.nome || '')}" placeholder="Nome completo" />
+        <input class="input" data-signatario="${i}" data-field="cargo"
+               value="${esc(s.cargo || '')}" placeholder="Cargo / Função (ex.: Fiscal Titular)" />
+        <input class="input" data-signatario="${i}" data-field="matricula"
+               value="${esc(s.matricula || '')}" placeholder="Matrícula / Lotação" />
+        <button class="signatario-item__del" data-signatario-del="${i}" title="Remover signatário">✕</button>
+      </div>
+    `).join('');
+  };
+
+  /* ---------- Regras ---------- */
   const SEV = { critico:'badge--crit', alerta:'badge--alert', info:'badge--info' };
 
   const renderRegras = () => {
@@ -605,9 +644,20 @@ const UI = (() => {
     `).join('');
   };
 
+  /* ---------- Handlers globais ---------- */
   const bindGlobal = () => {
     const handler = (e) => {
       const t = e.target;
+
+      /* Signatários */
+      const sigIdx = t.dataset?.signatario;
+      if (sigIdx !== undefined && t.dataset.field) {
+        state.signatarios[Number(sigIdx)][t.dataset.field] = t.value;
+        Audit.schedule();
+        return;
+      }
+
+      /* Campos data-bind */
       const bind = t.dataset?.bind;
       if (bind) {
         const v = t.type === 'checkbox' ? t.checked : t.value;
@@ -615,6 +665,8 @@ const UI = (() => {
         if (bind === 'orgao.nome') $('#hdrOrgao').textContent = v || 'Órgão não informado';
         Audit.schedule(); return;
       }
+
+      /* Itens */
       const idx = t.dataset?.item;
       if (idx !== undefined && t.dataset.field) {
         state.itens[Number(idx)][t.dataset.field] = t.value;
@@ -627,6 +679,7 @@ const UI = (() => {
   };
 
   const bindEvents = () => {
+    /* ----- Itens ----- */
     $('#btnAddItem')?.addEventListener('click', () => {
       state.itens.push({ id:uid('item'), descricao:'', unidade:'UN', quantidade:'', valorUnit:'' });
       renderItens(); Audit.schedule();
@@ -645,6 +698,29 @@ const UI = (() => {
       renderItens(); Audit.schedule();
     });
 
+    /* ----- Signatários ----- */
+    $('#btnAddSignatario')?.addEventListener('click', () => {
+      state.signatarios.push({ id: uid('sig'), nome:'', cargo:'', matricula:'' });
+      renderSignatarios();
+      Audit.schedule();
+      /* Foca o campo de nome do último signatário adicionado */
+      const rows = $$('#signatariosList .signatario-item');
+      const last = rows[rows.length - 1];
+      last?.querySelector('[data-field="nome"]')?.focus();
+    });
+
+    $('#signatariosList')?.addEventListener('click', (e) => {
+      const del = e.target.closest('[data-signatario-del]');
+      if (!del) return;
+      const idx = Number(del.dataset.signatarioDel);
+      const nome = state.signatarios[idx]?.nome || 'este signatário';
+      if (!confirm(`Remover "${nome}" da lista de assinaturas?`)) return;
+      state.signatarios.splice(idx, 1);
+      renderSignatarios();
+      Audit.schedule();
+    });
+
+    /* ----- Regras ----- */
     $('#formRegra')?.addEventListener('submit', (e) => {
       e.preventDefault();
       const fd = new FormData(e.target);
@@ -693,8 +769,13 @@ const UI = (() => {
     $('#hdrOrgao').textContent = state.orgao.nome || 'Órgão não informado';
   };
 
-  return { renderTipos, renderCampos, renderItens, updateTotais, renderRegras,
-           bindGlobal, bindEvents, syncBindings };
+  return {
+    renderTipos, renderCampos,
+    renderItens, updateTotais,
+    renderSignatarios,
+    renderRegras,
+    bindGlobal, bindEvents, syncBindings
+  };
 })();
 
 
@@ -732,10 +813,6 @@ const Importador = (() => {
       { path:'processo.vigencia',      keys:['vigencia','prazoVigencia','duracaoContrato'] },
       { path:'processo.prazoExecucao', keys:['prazoExecucao','prazoEntrega','prazoExecucaoDias','prazo'] },
       { path:'processo.cronograma',    keys:['cronograma','cronogramaExecucao','etapas'] },
-      { path:'equipe.gestor',          keys:['equipe.gestor','gestor','gestorContrato'] },
-      { path:'equipe.fiscalTecnico',   keys:['equipe.fiscalTecnico','fiscalTecnico','fiscal'] },
-      { path:'equipe.fiscalSubstituto',keys:['equipe.fiscalSubstituto','fiscalSubstituto','substituto'] },
-      { path:'equipe.fiscalAdministrativo', keys:['equipe.fiscalAdministrativo','fiscalAdministrativo'] },
       { path:'orgao.nome',             keys:['orgao.nome','orgao','unidadeAdministrativa','entidade'] },
       { path:'processo.numero',        keys:['processo.numero','numeroProcesso','protocolo','id'] },
       { path:'processo.modalidade',    keys:['modalidade','processo.modalidade'] }
@@ -749,6 +826,7 @@ const Importador = (() => {
       }
     });
 
+    /* Itens */
     const itens = pick(raiz, ['itens','quantidades','itensDemandados','produtos','lotes','objeto.itens']);
     if (Array.isArray(itens) && itens.length) {
       state.itens = itens.map(i => ({
@@ -761,6 +839,30 @@ const Importador = (() => {
       ap.push(`itens (${state.itens.length})`);
     }
 
+    /* Signatários — a partir de um objeto "equipe" ou "signatarios" no JSON */
+    const equipe = pick(raiz, ['equipe']);
+    const signatariosRaw = pick(raiz, ['signatarios']);
+    if (Array.isArray(signatariosRaw) && signatariosRaw.length) {
+      state.signatarios = signatariosRaw.map(s => ({
+        id: uid('sig'),
+        nome: String(pick(s, ['nome','nomeCompleto','responsavel']) ?? ''),
+        cargo: String(pick(s, ['cargo','funcao','papel','role']) ?? ''),
+        matricula: String(pick(s, ['matricula','lotacao','registro']) ?? '')
+      }));
+      ap.push(`signatários (${state.signatarios.length})`);
+    } else if (equipe && typeof equipe === 'object') {
+      const novos = [];
+      if (equipe.fiscalTecnico)      novos.push({ nome: equipe.fiscalTecnico,      cargo: 'Fiscal Técnico Titular', matricula: '' });
+      if (equipe.fiscalSubstituto)   novos.push({ nome: equipe.fiscalSubstituto,   cargo: 'Fiscal Substituto',      matricula: '' });
+      if (equipe.gestor)             novos.push({ nome: equipe.gestor,             cargo: 'Gestor do Contrato',     matricula: '' });
+      if (equipe.fiscalAdministrativo) novos.push({ nome: equipe.fiscalAdministrativo, cargo: 'Fiscal Administrativo', matricula: '' });
+      if (novos.length) {
+        state.signatarios = novos.map(n => ({ id: uid('sig'), ...n }));
+        ap.push(`signatários (${novos.length})`);
+      }
+    }
+
+    /* Tipo inferido */
     const hint = String(pick(raiz, ['tipo','tipoContratacao','natureza']) ?? '').toLowerCase();
     if (hint) {
       if (/obra|engenharia/.test(hint))            state.processo.tipo = 'obras_engenharia';
@@ -806,6 +908,7 @@ const Importador = (() => {
     UI.renderTipos();
     UI.renderCampos();
     UI.renderItens();
+    UI.renderSignatarios();
     Audit.schedule();
 
     if (!ap.length) {
@@ -867,7 +970,13 @@ const Importador = (() => {
         dotacao:'02.001.04.122.0002.2003.33903000 — Fonte 01 — Exercício corrente',
         prazoExecucao:'30 (trinta) dias corridos',
         vigencia:'12 (doze) meses',
-        itens:[{ descricao:'Item de exemplo — descrever conforme catálogo', unidade:'UN', quantidade:10, valorUnit:250 }]
+        itens:[{ descricao:'Item de exemplo — descrever conforme catálogo', unidade:'UN', quantidade:10, valorUnit:250 }],
+        signatarios:[
+          { nome:'', cargo:'Fiscal Técnico Titular', matricula:'' },
+          { nome:'', cargo:'Fiscal Substituto',      matricula:'' },
+          { nome:'', cargo:'Gestor do Contrato',     matricula:'' },
+          { nome:'', cargo:'Autoridade Competente',  matricula:'' }
+        ]
       };
       finalize(apply(demo), 'exemplo-licitareq.json');
     });
@@ -882,8 +991,8 @@ const Importador = (() => {
    Arquitetura em 4 blocos:
      ① CAPA EXECUTIVA (página 1) — pageBreak: 'after'
      ② CORPO (seções 1 a 15) — fluxo contínuo
-     ③ FOLHA DE APROVAÇÃO E VALIDAÇÃO — pageBreak: 'before'
-     ④ AUTENTICAÇÃO E RASTREABILIDADE — pageBreak: 'before' (última página)
+     ③ FOLHA DE ASSINATURAS — grade 2×3, até 6 signatários por página
+     ④ AUTENTICAÇÃO E RASTREABILIDADE — última página
    ═══════════════════════════════════════════════════════════════ */
 const PdfBuilder = (() => {
   const CP = '#0D9488';   /* turquesa */
@@ -892,6 +1001,10 @@ const PdfBuilder = (() => {
   const CM = '#64748b';
   const CINZA_FUNDO = '#f1f5f9';
   const CINZA_LINHA = '#cbd5e1';
+
+  /* Limite estrito: 6 assinaturas por página (2 colunas × 3 linhas) */
+  const SIG_POR_PAGINA = 6;
+  const SIG_POR_LINHA = 2;
 
   const LAYOUT_TABELA = {
     hLineWidth: (i, node) => (i === 0 || i === node.table.body.length) ? 0.9 : 0.4,
@@ -914,14 +1027,11 @@ const PdfBuilder = (() => {
     pequeno:      { fontSize: 7.5, color: CM, italics: true },
     capaLabel:    { fontSize: 8, bold: true, color: CM, characterSpacing: 0.5 },
     capaValor:    { fontSize: 10, color: CT, margin:[0,2,0,0] },
-    assinaturaNome:{ fontSize: 9.5, bold: true, color: CT, alignment:'center', margin:[0,4,0,0] },
-    assinaturaCargo:{ fontSize: 8, color: CM, alignment:'center' },
     metaLabel:    { fontSize: 7.5, bold: true, color: CM, characterSpacing: 0.4 },
-    metaValor:    { fontSize: 8.5, color: CT },
-    rodape:       { fontSize: 6.5, color: CM, alignment:'center' }
+    metaValor:    { fontSize: 8.5, color: CT }
   };
 
-  /* ─── Helpers de composição ─── */
+  /* ─── Helpers ─── */
   const secao = (n, t) => ({
     table:{
       widths:['*'],
@@ -953,7 +1063,9 @@ const PdfBuilder = (() => {
     margin:[0,0,0,8]
   });
 
-  /* ─── BLOCO ① · CAPA EXECUTIVA ─── */
+  /* ═══════════════════════════════════════════════════════════
+     BLOCO ① · CAPA EXECUTIVA
+     ═══════════════════════════════════════════════════════════ */
   const buildCapa = (logo, tipo, dataEmissao, trace) => {
     const p = state.processo;
     const itens = state.itens;
@@ -969,11 +1081,11 @@ const PdfBuilder = (() => {
       ['Objeto (resumo)',            p.objeto ? String(p.objeto).slice(0, 260) : '—'],
       ['Valor Total Estimado',       brl(valorTotal)],
       ['Responsável Técnico',        [state.orgao.responsavel, state.orgao.cargo].filter(Boolean).join(' — ') || '—'],
+      ['Total de Signatários',       String(state.signatarios.length)],
       ['Data de Emissão',            dataEmissao]
     ];
 
     return [
-      /* Faixa superior decorativa */
       {
         canvas: [
           { type:'rect', x:0, y:0, w:515, h:5, color: CE },
@@ -982,12 +1094,10 @@ const PdfBuilder = (() => {
         margin:[0, 0, 0, 26]
       },
 
-      /* Logotipo centralizado */
       logo
         ? { image: logo, width: 92, alignment:'center', margin:[0, 0, 0, 18] }
         : { text:'', margin:[0, 0, 0, 18] },
 
-      /* Título institucional */
       { text:'TERMO DE REFERÊNCIA', style:'tituloCapa' },
       {
         canvas:[
@@ -1000,7 +1110,6 @@ const PdfBuilder = (() => {
         style:'subtituloCapa'
       },
 
-      /* Nome do órgão em destaque */
       {
         text: (state.orgao.nome || 'ÓRGÃO OU ENTIDADE PÚBLICA').toUpperCase(),
         fontSize: 12, bold: true, color: CE, alignment:'center',
@@ -1012,7 +1121,6 @@ const PdfBuilder = (() => {
         margin:[0, 0, 0, 28]
       },
 
-      /* Bloco de metadados principais */
       {
         table:{
           widths:['*'],
@@ -1061,7 +1169,6 @@ const PdfBuilder = (() => {
         margin:[0, 0, 0, 30]
       },
 
-      /* Selo de autenticidade resumido */
       {
         table:{
           widths:['*'],
@@ -1071,7 +1178,7 @@ const PdfBuilder = (() => {
                 width:'*',
                 stack:[
                   { text:'SELO DIGITAL OMNILICIT', style:'capaLabel', margin:[0,0,0,4] },
-                  { text: trace.selo, fontSize:8, bold:true, color:CE, font:'Roboto' }
+                  { text: trace.selo, fontSize:8, bold:true, color:CE }
                 ]
               },
               {
@@ -1097,17 +1204,17 @@ const PdfBuilder = (() => {
         margin:[0, 0, 0, 0]
       },
 
-      /* Quebra de página obrigatória ao final da capa */
       { text:'', pageBreak:'after' }
     ];
   };
 
-  /* ─── BLOCO ② · CORPO (seções 1 a 15) ─── */
+  /* ═══════════════════════════════════════════════════════════
+     BLOCO ② · CORPO (seções 1 a 15)
+     ═══════════════════════════════════════════════════════════ */
   const buildCorpo = (tipo) => {
     const p = state.processo;
     const body = [];
 
-    /* 1. Identificação */
     body.push(secao(1,'Identificação do Processo'));
     body.push(kv([
       ['Nº do Processo', p.numero],
@@ -1119,15 +1226,12 @@ const PdfBuilder = (() => {
         [state.orgao.responsavel, state.orgao.cargo].filter(Boolean).join(' — ')]
     ]));
 
-    /* 2. Objeto */
     body.push(secao(2,'Do Objeto'));
     body.push(par(p.objeto));
 
-    /* 3. Justificativa */
     body.push(secao(3,'Da Justificativa e Motivação'));
     body.push(par(p.justificativa));
 
-    /* 4. Solução e especificações */
     body.push(secao(4,'Da Descrição da Solução e Especificações Técnicas'));
     body.push(par(p.especificacoes));
 
@@ -1186,11 +1290,9 @@ const PdfBuilder = (() => {
       body.push(par('Nenhum item especificado.'));
     }
 
-    /* 6. Dotação */
     body.push(secao(6,'Da Dotação Orçamentária'));
     body.push(par(p.dotacao));
 
-    /* 7. Prazos */
     body.push(secao(7,'Dos Prazos, Vigência e Cronograma'));
     body.push(kv([
       ['Prazo de Vigência', p.vigencia],
@@ -1201,19 +1303,11 @@ const PdfBuilder = (() => {
       body.push(par(p.cronograma));
     }
 
-    /* 8. Execução */
     body.push(secao(8,'Do Modelo de Execução e Obrigações'));
     body.push(par(p.modeloExecucao));
 
-    /* 9. Gestão */
     body.push(secao(9,'Do Modelo de Gestão e Fiscalização'));
-    body.push(kv([
-      ['Gestor do Contrato', state.equipe.gestor],
-      ['Fiscal Técnico', state.equipe.fiscalTecnico],
-      ['Fiscal Substituto', state.equipe.fiscalSubstituto],
-      ['Fiscal Administrativo', state.equipe.fiscalAdministrativo]
-    ]));
-    if (p.modeloGestao) body.push(par(p.modeloGestao));
+    body.push(par(p.modeloGestao));
 
     /* 10. Pagamento */
     body.push(secao(10,'Das Condições de Pagamento'));
@@ -1227,7 +1321,7 @@ const PdfBuilder = (() => {
     body.push(secao(12,'Das Sanções Administrativas'));
     body.push(par(p.sancoes));
 
-    /* 13. Sustentabilidade e LGPD */
+    /* 13. Sustentabilidade / LGPD */
     body.push(secao(13,'Da Sustentabilidade e Proteção de Dados'));
     body.push({ text:'Sustentabilidade Ambiental', style:'rotulo', margin:[0,2,0,2] });
     body.push(par(p.sustentabilidade));
@@ -1268,125 +1362,192 @@ const PdfBuilder = (() => {
     return body;
   };
 
-  /* ─── BLOCO ③ · FOLHA DE APROVAÇÃO E VALIDAÇÃO ─── */
-  const buildAssinaturas = () => {
-    const dataHoje = new Date().toLocaleDateString('pt-BR');
+  /* ═══════════════════════════════════════════════════════════
+     BLOCO ③ · FOLHA DE ASSINATURAS (grade 2×3 · 6 por página)
+     ═══════════════════════════════════════════════════════════ */
+  const buildSignatureBlock = (s) => ({
+    stack: [
+      {
+        text: s.cargo || '—',
+        fontSize: 8, bold: true, color: CE,
+        characterSpacing: 0.4,
+        margin: [0, 0, 0, 42]
+      },
+      {
+        canvas: [{
+          type: 'line', x1: 0, y1: 0, x2: 200, y2: 0,
+          lineWidth: 0.7, lineColor: '#334155'
+        }]
+      },
+      {
+        text: s.nome || '_________________________',
+        fontSize: 9.5, bold: true, color: CT,
+        alignment: 'center', margin: [0, 4, 0, 0]
+      },
+      {
+        text: s.matricula ? `Matrícula: ${s.matricula}` : ' ',
+        fontSize: 8, color: CM,
+        alignment: 'center', margin: [0, 2, 0, 0]
+      },
+      {
+        text: 'Data: ____/____/______',
+        fontSize: 7.5, color: CM,
+        alignment: 'center', margin: [0, 12, 0, 0]
+      },
+      {
+        text: 'Carimbo:',
+        fontSize: 7.5, color: CM,
+        alignment: 'center', margin: [0, 2, 0, 0]
+      }
+    ],
+    margin: [12, 14, 12, 14]
+  });
 
-    const blocoAssinatura = (titulo, nome, cargo, artRef) => ({
-      table:{
-        widths:['*'],
-        body:[[{
-          stack:[
-            { text:titulo, fontSize:8, bold:true, color:CE, characterSpacing:0.5,
-              margin:[0,0,0,22] },
-            { text:' ' },
-            {
-              canvas:[{ type:'line', x1:0, y1:0, x2:220, y2:0, lineWidth:0.7, lineColor:'#334155' }],
-              margin:[0, 26, 0, 0]
-            },
-            { text: nome || '_________________________', style:'assinaturaNome' },
-            { text: cargo || '—', style:'assinaturaCargo' },
-            { text: artRef || '', fontSize:7, color:CM, alignment:'center', margin:[0,2,0,0] },
-            { text:' ', margin:[0, 8, 0, 0] },
-            { text:`Data: ____/____/______`, fontSize:7.5, color:CM, alignment:'center' },
-            { text:`Carimbo:`, fontSize:7.5, color:CM, alignment:'center', margin:[0,2,0,0] },
-            { text:' ', margin:[0, 18, 0, 0] },
-            {
-              canvas:[{ type:'dashed', x1:0, y1:0, x2:220, y2:0, lineWidth:0.4, dash:{ length:2, space:2 }, lineColor:CINZA_LINHA }]
-            }
-          ],
-          margin:[14, 14, 14, 14]
-        }]]
-      },
-      layout:{
-        hLineWidth: () => 0.6,
-        vLineWidth: () => 0.6,
-        hLineColor: () => CINZA_LINHA,
-        vLineColor: () => CINZA_LINHA,
-        paddingLeft: () => 0, paddingRight: () => 0,
-        paddingTop: () => 0, paddingBottom: () => 0
-      },
-      margin:[0, 0, 0, 14]
+  const buildFolhaAssinaturas = () => {
+    const out = [];
+    const signatarios = state.signatarios;
+
+    /* Sem signatários — página única com aviso */
+    if (!signatarios.length) {
+      out.push(
+        { text:'', pageBreak:'before' },
+        {
+          table:{
+            widths:['*'],
+            body:[[{
+              text:'FOLHA DE APROVAÇÃO E VALIDAÇÃO',
+              fontSize:14, bold:true, color:'#fff',
+              margin:[10, 8, 10, 8]
+            }]]
+          },
+          layout:'noBorders',
+          fillColor: CE,
+          margin:[0, 0, 0, 6]
+        },
+        {
+          text:'Termo de Referência — assinaturas das autoridades e agentes responsáveis, conforme Lei nº 14.133/2021.',
+          fontSize:8.5, color:CM, alignment:'center', margin:[0, 0, 0, 24]
+        },
+        {
+          text:'Nenhum signatário foi cadastrado para este Termo de Referência.',
+          fontSize:10, color:CM, alignment:'center',
+          margin:[0, 40, 0, 0]
+        }
+      );
+      return out;
+    }
+
+    /* Chunking: divide os signatários em lotes de 6 */
+    const lotes = [];
+    for (let i = 0; i < signatarios.length; i += SIG_POR_PAGINA) {
+      lotes.push(signatarios.slice(i, i + SIG_POR_PAGINA));
+    }
+
+    /* Monta uma página dedicada para cada lote */
+    lotes.forEach((lote, pageIdx) => {
+      const rows = [];
+
+      /* Constrói linhas de 2 colunas (SIG_POR_LINHA) */
+      for (let i = 0; i < lote.length; i += SIG_POR_LINHA) {
+        const par = lote.slice(i, i + SIG_POR_LINHA);
+        const row = par.map(s => buildSignatureBlock(s));
+        while (row.length < SIG_POR_LINHA) {
+          row.push({ text: '', margin: [12, 14, 12, 14] });
+        }
+        rows.push(row);
+      }
+
+      /* Garante exatamente 3 linhas (grade 2×3 completa) */
+      while (rows.length < 3) {
+        rows.push([
+          { text: '', margin: [12, 14, 12, 14] },
+          { text: '', margin: [12, 14, 12, 14] }
+        ]);
+      }
+
+      const totalPaginas = lotes.length;
+      const pageLabel = totalPaginas > 1
+        ? ` (página ${pageIdx + 1} de ${totalPaginas})`
+        : '';
+
+      const inicio = pageIdx * SIG_POR_PAGINA + 1;
+      const fim = Math.min(inicio + lote.length - 1, signatarios.length);
+
+      out.push(
+        { text:'', pageBreak:'before' },
+        {
+          table:{
+            widths:['*'],
+            body:[[{
+              text:`FOLHA DE APROVAÇÃO E VALIDAÇÃO${pageLabel}`,
+              fontSize:14, bold:true, color:'#fff',
+              margin:[10, 8, 10, 8]
+            }]]
+          },
+          layout:'noBorders',
+          fillColor: CE,
+          margin:[0, 0, 0, 6]
+        },
+        {
+          text:'Termo de Referência — assinaturas das autoridades e agentes responsáveis, conforme Lei nº 14.133/2021.',
+          fontSize:8.5, color:CM, alignment:'center', margin:[0, 0, 0, 18]
+        },
+
+        /* Identificação resumida */
+        {
+          table:{
+            widths:['32%','*'],
+            body:[
+              ['Processo', state.processo.numero || '—'],
+              ['Órgão', state.orgao.nome || '—'],
+              ['Objeto (resumo)',
+                state.processo.objeto ? String(state.processo.objeto).slice(0, 180) : '—'],
+              ['Data de Referência', new Date().toLocaleDateString('pt-BR')],
+              ['Signatários exibidos',
+                `${inicio} a ${fim} de ${signatarios.length}`]
+            ].map(([k, v]) => ([
+              { text: k, style: 'rotulo', fillColor: CINZA_FUNDO },
+              { text: String(v), style: 'valor' }
+            ]))
+          },
+          layout: LAYOUT_TABELA,
+          margin:[0, 0, 0, 16]
+        },
+
+        /* Grade 2×3 de assinaturas */
+        {
+          table: {
+            widths: ['50%', '50%'],
+            body: rows,
+            dontBreakRows: true
+          },
+          layout: {
+            hLineWidth: () => 0,
+            vLineWidth: () => 0,
+            paddingLeft: () => 4,
+            paddingRight: () => 4,
+            paddingTop: () => 4,
+            paddingBottom: () => 4
+          },
+          margin: [0, 0, 0, 0]
+        },
+
+        /* Rodapé explicativo */
+        {
+          text:'A ausência de assinatura em qualquer dos campos acima implica pendência de instrução processual ' +
+               'e impede o prosseguimento da contratação, nos termos do art. 72 da Lei nº 14.133/2021.',
+          fontSize: 7, color: CM, italics: true, alignment: 'center',
+          margin:[0, 12, 0, 0]
+        }
+      );
     });
 
-    return [
-      /* Quebra de página — inicia nova folha dedicada */
-      { text:'', pageBreak:'before' },
-
-      /* Cabeçalho da folha */
-      {
-        table:{
-          widths:['*'],
-          body:[[{
-            text:'FOLHA DE APROVAÇÃO E VALIDAÇÃO',
-            fontSize:14, bold:true, color:'#fff',
-            margin:[10, 8, 10, 8]
-          }]]
-        },
-        layout:'noBorders',
-        fillColor: CE,
-        margin:[0, 0, 0, 6]
-      },
-      {
-        text:'Termo de Referência — assinaturas das autoridades e agentes responsáveis, conforme Lei nº 14.133/2021.',
-        fontSize:8.5, color:CM, alignment:'center', margin:[0, 0, 0, 22]
-      },
-
-      /* Identificação resumida do processo */
-      {
-        table:{
-          widths:['32%','*'],
-          body:[
-            ['Processo', state.processo.numero || '—'],
-            ['Objeto (resumo)',
-              state.processo.objeto ? String(state.processo.objeto).slice(0, 180) : '—'],
-            ['Órgão', state.orgao.nome || '—'],
-            ['Data de Referência', dataHoje]
-          ].map(([k,v]) => ([
-            { text:k, style:'rotulo', fillColor:CINZA_FUNDO },
-            { text:String(v), style:'valor' }
-          ]))
-        },
-        layout: LAYOUT_TABELA,
-        margin:[0, 0, 0, 24]
-      },
-
-      /* Blocos de assinatura */
-      blocoAssinatura(
-        'FISCAL TÉCNICO TITULAR',
-        state.equipe.fiscalTecnico,
-        'Fiscal do Contrato — Titular',
-        'Designado nos termos do art. 117 da Lei nº 14.133/2021'
-      ),
-      blocoAssinatura(
-        'FISCAL SUBSTITUTO',
-        state.equipe.fiscalSubstituto,
-        'Fiscal do Contrato — Substituto',
-        'Designado nos termos do art. 117 da Lei nº 14.133/2021'
-      ),
-      blocoAssinatura(
-        'GESTOR DO CONTRATO',
-        state.equipe.gestor,
-        'Gestor designado pela autoridade competente',
-        'Designado nos termos do art. 117 da Lei nº 14.133/2021'
-      ),
-      blocoAssinatura(
-        'AUTORIDADE COMPETENTE',
-        state.orgao.responsavel,
-        state.orgao.cargo || 'Autoridade Competente',
-        'Aprova e ratifica o presente Termo de Referência'
-      ),
-
-      /* Rodapé explicativo da folha */
-      {
-        text:'A ausência de assinatura em qualquer dos campos acima implica pendência de instrução processual ' +
-             'e impede o prosseguimento da contratação, nos termos do art. 72 da Lei nº 14.133/2021.',
-        fontSize:7, color:CM, italics:true, alignment:'center', margin:[0, 14, 0, 0]
-      }
-    ];
+    return out;
   };
 
-  /* ─── BLOCO ④ · AUTENTICAÇÃO E RASTREABILIDADE (última página) ─── */
+  /* ═══════════════════════════════════════════════════════════
+     BLOCO ④ · AUTENTICAÇÃO E RASTREABILIDADE
+     ═══════════════════════════════════════════════════════════ */
   const buildAutenticacao = (issues, trace) => {
     const dataHora = new Date(trace.timestamp).toLocaleString('pt-BR');
 
@@ -1414,10 +1575,7 @@ const PdfBuilder = (() => {
     }
 
     return [
-      /* Quebra de página — inicia nova folha dedicada */
       { text:'', pageBreak:'before' },
-
-      /* Cabeçalho */
       {
         table:{
           widths:['*'],
@@ -1457,7 +1615,7 @@ const PdfBuilder = (() => {
         margin:[0, 0, 0, 18]
       },
 
-      /* Metadados de rastreabilidade */
+      /* Metadados */
       {
         table:{
           widths:['*'],
@@ -1474,8 +1632,9 @@ const PdfBuilder = (() => {
                     ['Timestamp de Geração', dataHora],
                     ['Módulo Emissor', 'LicitaTR v' + state.meta.versao],
                     ['Órgão Emissor', state.orgao.nome || '—'],
+                    ['Total de Signatários', String(state.signatarios.length)],
                     ['Auditoria Cruzada', 'LicitaAudit — verificação de integridade e conformidade'],
-                    ['Versão do Documento', 'TR-1.0']
+                    ['Versão do Documento', 'TR-1.1']
                   ].map(([k,v], idx) => ([
                     { text:k, style:'metaLabel',
                       fillColor: idx % 2 === 0 ? CINZA_FUNDO : '#ffffff',
@@ -1508,7 +1667,7 @@ const PdfBuilder = (() => {
         margin:[0, 0, 0, 18]
       },
 
-      /* Matriz de conformidade / auditoria cruzada */
+      /* Matriz de conformidade */
       {
         text:'MATRIZ DE CONFORMIDADE E AUDITORIA CRUZADA',
         fontSize:9, bold:true, color:CE, characterSpacing:0.5,
@@ -1569,10 +1728,9 @@ const PdfBuilder = (() => {
     const dataEmissao = new Date().toLocaleString('pt-BR');
     const logo = state.orgao.logoDataUrl || await srcToDataUrl(Logo.FALLBACK);
 
-    /* Composição dos 4 blocos com suas respectivas quebras */
     const capa         = buildCapa(logo, tipo, dataEmissao, trace);
     const corpo        = buildCorpo(tipo);
-    const assinaturas  = buildAssinaturas();
+    const assinaturas  = buildFolhaAssinaturas();
     const autenticacao = buildAutenticacao(issues, trace);
 
     const content = [
@@ -1595,7 +1753,6 @@ const PdfBuilder = (() => {
       styles: STYLES,
       defaultStyle:{ fontSize:9.5, color:CT },
 
-      /* Cabeçalho fixo (todas as páginas, exceto quando sobrescrito) */
       header: (currentPage) => {
         if (currentPage === 1) return null; /* Capa sem cabeçalho */
         return {
@@ -1617,7 +1774,6 @@ const PdfBuilder = (() => {
         };
       },
 
-      /* Rodapé fixo com rastreabilidade */
       footer: (currentPage, total) => {
         if (currentPage === 1) return null; /* Capa sem rodapé */
         return {
@@ -1653,7 +1809,7 @@ const PdfBuilder = (() => {
     };
   };
 
-  return { build };
+  return { build, SIG_POR_PAGINA };
 })();
 
 
@@ -1704,14 +1860,16 @@ const Actions = (() => {
         modalidade: state.processo.modalidade,
         objeto: state.processo.objeto
       },
-      equipe: state.equipe,
+      signatarios: state.signatarios,
       regrasAtivas: state.regras.filter(r => r.ativa),
       apontamentos: issues,
       resumo: {
         total: issues.length,
         criticos: issues.filter(i => i.severidade === 'critico').length,
         alertas: issues.filter(i => i.severidade === 'alerta').length,
-        informativos: issues.filter(i => i.severidade === 'info').length
+        informativos: issues.filter(i => i.severidade === 'info').length,
+        signatarios: state.signatarios.length,
+        paginasAssinaturas: Math.ceil(state.signatarios.length / 6) || 1
       }
     };
 
@@ -1735,9 +1893,32 @@ const Actions = (() => {
     try {
       const raw = localStorage.getItem(KEY);
       if (!raw) return false;
-      Object.assign(state, JSON.parse(raw));
-      /* Garante a presença do campo fiscalSubstituto em rascunhos antigos */
-      if (!state.equipe.fiscalSubstituto) state.equipe.fiscalSubstituto = '';
+      const data = JSON.parse(raw);
+      Object.assign(state, data);
+
+      /* Migração 1: rascunho antigo com "equipe" → signatarios */
+      if (!Array.isArray(state.signatarios)) state.signatarios = [];
+      if (state.equipe && !state.signatarios.length) {
+        const padrao = [
+          { cargo:'Fiscal Técnico Titular', nome: state.equipe.fiscalTecnico },
+          { cargo:'Fiscal Substituto',      nome: state.equipe.fiscalSubstituto },
+          { cargo:'Gestor do Contrato',     nome: state.equipe.gestor },
+          { cargo:'Fiscal Administrativo',  nome: state.equipe.fiscalAdministrativo },
+          { cargo:'Autoridade Competente',  nome: state.orgao.responsavel }
+        ];
+        state.signatarios = padrao
+          .filter(d => d.nome)
+          .map(d => ({ id: uid('sig'), nome: d.nome, cargo: d.cargo, matricula: '' }));
+      }
+
+      /* Migração 2: se ainda estiver vazio, aplica o padrão de 4 cargos */
+      if (!state.signatarios.length) {
+        state.signatarios = SIG_PADRAO();
+      }
+
+      /* Remove referência antiga */
+      delete state.equipe;
+
       return true;
     } catch (_) { return false; }
   };
@@ -1768,11 +1949,16 @@ const Actions = (() => {
     state.itens = [{ id:uid('item'), descricao:'', unidade:'UN', quantidade:'', valorUnit:'' }];
   }
 
+  if (!state.signatarios.length) {
+    state.signatarios = SIG_PADRAO();
+  }
+
   const restaurado = Actions.carregar();
 
   UI.renderTipos();
   UI.renderCampos();
   UI.renderItens();
+  UI.renderSignatarios();
   UI.renderRegras();
   UI.syncBindings();
 
@@ -1789,7 +1975,7 @@ const Actions = (() => {
 
   setInterval(() => Trace.schedule(), 30000);
 
-  console.info('%cOmniLicit · LicitaTR v1.0.0',
+  console.info('%cOmniLicit · LicitaTR v1.1.0',
     'color:#0D9488;font-weight:bold',
-    '— módulo de Termo de Referência inicializado com arquitetura PDF em 4 blocos.');
+    `— módulo inicializado. Limite do PDF: ${PdfBuilder.SIG_POR_PAGINA} assinaturas por página (grade 2×3).`);
 })();
