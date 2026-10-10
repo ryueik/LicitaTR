@@ -1,62 +1,60 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR" class="dark">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>LicitaTR · OmniLicit — Termo de Referência (Lei nº 14.133/2021)</title>
 <meta name="description" content="Módulo LicitaTR do ecossistema OmniLicit — elaboração auditável de Termos de Referência." />
 
-<!-- Favicon (trocado via JS pelo LogoManager) -->
 <link rel="icon" id="favicon" type="image/png" href="logo-omnlicit.png" />
-
-<!-- Estilos -->
 <link rel="stylesheet" href="style.css" />
 
-<!-- pdfMake -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-
-<!-- pdf.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 
 <body>
 
-<!-- ═══════════════ HEADER ═══════════════ -->
-<header class="app-header">
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header class="app-header no-print">
   <div class="container app-header__inner">
 
     <div class="brand">
+      <div class="brand__glow"></div>
       <img data-logo src="logo-omnlicit.png" alt="OmniLicit" class="brand__logo"
            onerror="this.onerror=null;this.src='logo-omnlicit.png';" />
       <div class="brand__text">
-        <h1 class="brand__title">LicitaTR <span class="brand__suffix">· OmniLicit</span></h1>
+        <h1 class="brand__title">Licita<span class="text-petrol">TR</span>
+          <span class="brand__suffix">· OmniLicit</span>
+        </h1>
         <p class="brand__subtitle">
-          Termo de Referência · Lei nº 14.133/2021 ·
-          <span id="hdrOrgao">Órgão não informado</span>
+          Lei nº 14.133/2021 · <span id="hdrOrgao">Órgão não informado</span>
         </p>
       </div>
     </div>
 
     <div class="app-header__actions">
-      <span id="seloPreview" class="badge badge--ghost mono hidden-mobile">
+      <span id="seloPreview" class="selo-preview mono">
         OMNILICIT::TR::—::—
       </span>
 
-      <button class="btn btn--icon" id="btnTheme" type="button" title="Alternar tema" aria-label="Alternar tema">
-        <span class="icon-sun" aria-hidden="true">☀</span>
-        <span class="icon-moon" aria-hidden="true">🌙</span>
+      <button id="themeToggle" type="button" class="theme-toggle" aria-label="Alternar tema" title="Alternar tema">
+        <span class="theme-toggle__knob">
+          <span class="icon icon--moon">🌙</span>
+          <span class="icon icon--sun">☀️</span>
+        </span>
       </button>
 
-      <button class="btn btn--ghost" id="btnSalvar" type="button" title="Salvar rascunho (Ctrl+S)">
+      <button id="btnSalvar" type="button" class="btn btn--ghost" title="Salvar rascunho (Ctrl+S)">
         💾 <span class="btn__label">Rascunho</span>
       </button>
 
-      <button class="btn btn--ghost" id="btnAuditoria" type="button">
+      <button id="btnAuditoria" type="button" class="btn btn--ghost" title="Exportar pacote de auditoria">
         📦 <span class="btn__label">Auditoria</span>
       </button>
 
-      <button class="btn btn--primary" id="btnPdf" type="button" title="Gerar PDF (Ctrl+Enter)">
+      <button id="btnPdf" type="button" class="btn btn--primary" title="Gerar PDF (Ctrl+Enter)">
         📄 <span class="btn__label">Gerar PDF</span>
       </button>
     </div>
@@ -65,7 +63,7 @@
 </header>
 
 
-<!-- ═══════════════ MAIN ═══════════════ -->
+<!-- ═══════════════════ MAIN ═══════════════════ -->
 <main class="container app-main">
 
   <!-- ─── COLUNA FORMULÁRIO ─── -->
@@ -77,7 +75,7 @@
         <summary class="card__head">
           <span class="card__num">1</span>
           <span class="card__title">Órgão, Identidade Visual e Responsáveis</span>
-          <span class="chev" aria-hidden="true">▾</span>
+          <span class="chev">▾</span>
         </summary>
 
         <div class="card__body grid grid--2">
@@ -97,7 +95,7 @@
           </label>
 
           <label class="field">
-            <span class="label">Autoridade Responsável</span>
+            <span class="label">Autoridade Competente</span>
             <input class="input" data-bind="orgao.responsavel" placeholder="Nome completo" />
           </label>
 
@@ -107,15 +105,16 @@
           </label>
 
           <div class="field field--full divider-top">
-            <span class="label">Logotipo Institucional (fallback automático: logo-omnlicit.png)</span>
+            <span class="label">Logotipo Institucional</span>
             <div class="logo-row">
               <img id="logoPreview" src="logo-omnlicit.png" alt="Pré-visualização" class="logo-preview"
                    onerror="this.onerror=null;this.src='logo-omnlicit.png';" />
               <div class="logo-actions">
                 <input type="file" id="logoInput" accept="image/png,image/jpeg,image/svg+xml" class="file-input" />
-                <p class="hint">Sem upload, o sistema utiliza o escudo facetado oficial do OmniLicit.</p>
+                <p class="hint">Sem upload, o sistema utiliza o escudo oficial
+                  <code class="mono text-petrol">logo-omnlicit.png</code> da raiz.</p>
               </div>
-              <button class="btn btn--ghost" id="btnLogoReset" type="button">↺ Restaurar padrão</button>
+              <button id="btnLogoReset" type="button" class="btn btn--ghost">↺ Padrão</button>
             </div>
           </div>
         </div>
@@ -127,15 +126,15 @@
       <details open>
         <summary class="card__head">
           <span class="card__num">2</span>
-          <span class="card__title">Regras Normativas Próprias do Órgão (Compliance)</span>
-          <span id="regrasCount" class="badge badge--primary">0</span>
-          <span class="chev" aria-hidden="true">▾</span>
+          <span class="card__title">Regras Normativas do Órgão (Compliance)</span>
+          <span id="regrasCount" class="badge badge--info">0</span>
+          <span class="chev">▾</span>
         </summary>
 
         <div class="card__body">
-          <div class="row row--gap">
-            <button class="btn btn--ghost" id="btnRegrasLimpar" type="button">🗑 Limpar todas</button>
-            <span class="hint">Cadastre regras específicas do seu órgão. O motor audita o TR em tempo real.</span>
+          <div class="row row--between">
+            <p class="hint">Cadastre as normas internas do seu órgão. A auditoria é executada em tempo real.</p>
+            <button id="btnRegrasLimpar" type="button" class="btn btn--ghost">🗑 Limpar todas</button>
           </div>
 
           <div id="regrasList" class="regras-list"></div>
@@ -143,11 +142,11 @@
           <form id="formRegra" class="regra-form">
             <label class="field field--span6">
               <span class="label">Título da regra</span>
-              <input class="input" name="titulo" required placeholder="Ex.: Vedação à cobrança de frete" />
+              <input class="input" name="titulo" required placeholder="Ex.: Vedação à cobrança de frete ao órgão" />
             </label>
 
             <label class="field field--span3">
-              <span class="label">Tipo de verificação</span>
+              <span class="label">Verificação</span>
               <select class="input" name="tipo">
                 <option value="contem">Exige cláusula (contém)</option>
                 <option value="nao_contem">Veda termo (não contém)</option>
@@ -168,7 +167,7 @@
             <label class="field field--span5">
               <span class="label">Campo-alvo</span>
               <select class="input" name="alvo">
-                <option value="full">Documento completo (texto integral)</option>
+                <option value="full">Documento completo</option>
                 <option value="processo.objeto">Objeto</option>
                 <option value="processo.justificativa">Justificativa</option>
                 <option value="processo.especificacoes">Especificações técnicas</option>
@@ -193,7 +192,7 @@
             </label>
 
             <div class="field field--full row row--end">
-              <button class="btn btn--primary" type="submit">＋ Adicionar regra</button>
+              <button type="submit" class="btn btn--primary">＋ Adicionar regra</button>
             </div>
           </form>
         </div>
@@ -205,14 +204,14 @@
       <details open>
         <summary class="card__head">
           <span class="card__num">3</span>
-          <span class="card__title">Identificação do Processo e Tipo de Contratação</span>
-          <span class="chev" aria-hidden="true">▾</span>
+          <span class="card__title">Identificação e Tipo de Contratação</span>
+          <span class="chev">▾</span>
         </summary>
 
         <div class="card__body">
           <div class="grid grid--3">
             <label class="field">
-              <span class="label">Nº do Processo Administrativo</span>
+              <span class="label">Nº do Processo</span>
               <input class="input" data-bind="processo.numero" placeholder="Ex.: 2025/000123" />
             </label>
             <label class="field">
@@ -228,7 +227,7 @@
               </select>
             </label>
             <label class="field">
-              <span class="label">Regime / Critério de Julgamento</span>
+              <span class="label">Regime / Julgamento</span>
               <input class="input" data-bind="processo.regime" placeholder="Ex.: Menor Preço por Item" />
             </label>
           </div>
@@ -236,7 +235,7 @@
           <div class="field field--full">
             <span class="label">Tipo de Contratação (altera seções do TR)</span>
             <div id="tipoSelector" class="tipo-grid"></div>
-            <p class="hint">Fundamentação aplicável: <span id="tipoFundamento" class="text-primary">—</span></p>
+            <p class="hint">Fundamentação: <span id="tipoFundamento" class="text-petrol">—</span></p>
           </div>
 
           <div id="camposDinamicos" class="grid grid--2 divider-top"></div>
@@ -249,22 +248,23 @@
       <details open>
         <summary class="card__head">
           <span class="card__num">4</span>
-          <span class="card__title">Importação Inteligente — LicitaReq (DFD) / LicitaETP (ETP)</span>
-          <span class="chev" aria-hidden="true">▾</span>
+          <span class="card__title">Importação — LicitaReq (DFD) / LicitaETP (ETP)</span>
+          <span class="chev">▾</span>
         </summary>
 
         <div class="card__body">
           <div id="dropzone" class="dropzone" role="button" tabindex="0">
-            <input type="file" id="fileImport" class="hidden" accept=".json,.pdf,application/json,application/pdf" multiple />
+            <input type="file" id="fileImport" class="hidden"
+                   accept=".json,.pdf,application/json,application/pdf" multiple />
             <p class="dropzone__icon">📥</p>
-            <p class="dropzone__title">Arraste o arquivo JSON ou PDF gerado pelo LicitaReq / LicitaETP</p>
+            <p class="dropzone__title">Arraste o arquivo JSON ou PDF gerado pelos módulos anteriores</p>
             <p class="dropzone__hint">ou clique para selecionar · .json · .pdf</p>
           </div>
 
           <div id="importLog" class="import-log hidden"></div>
 
           <div class="row row--gap">
-            <button class="btn btn--ghost" id="btnImportDemo" type="button">🧪 Carregar exemplo genérico</button>
+            <button id="btnImportDemo" type="button" class="btn btn--ghost">🧪 Carregar exemplo genérico</button>
           </div>
         </div>
       </details>
@@ -275,21 +275,21 @@
       <details open>
         <summary class="card__head">
           <span class="card__num">5</span>
-          <span class="card__title">Objeto, Justificativa e Descrição da Solução</span>
-          <span class="chev" aria-hidden="true">▾</span>
+          <span class="card__title">Objeto, Justificativa e Solução</span>
+          <span class="chev">▾</span>
         </summary>
 
         <div class="card__body">
           <label class="field">
             <span class="label">Objeto da Contratação (art. 6º, XXIII)</span>
             <textarea class="input textarea" data-bind="processo.objeto"
-              placeholder="Ex.: Aquisição de 120 (cento e vinte) cadeiras de escritório, conforme especificações técnicas..."></textarea>
+              placeholder="Descreva de forma precisa, suficiente e clara o objeto a ser contratado..."></textarea>
           </label>
 
           <label class="field">
             <span class="label">Justificativa / Motivação da Necessidade</span>
             <textarea class="input textarea" data-bind="processo.justificativa"
-              placeholder="Descreva o problema público, a necessidade administrativa e o nexo causal com a contratação..."></textarea>
+              placeholder="Descreva o problema público, a necessidade administrativa e o nexo causal..."></textarea>
           </label>
 
           <label class="field">
@@ -307,8 +307,8 @@
         <summary class="card__head">
           <span class="card__num">6</span>
           <span class="card__title">Itens, Quantidades e Estimativa de Valor</span>
-          <span id="itensBadge" class="badge badge--ghost">0 itens</span>
-          <span class="chev" aria-hidden="true">▾</span>
+          <span id="itensBadge" class="badge badge--info">0 itens</span>
+          <span class="chev">▾</span>
         </summary>
 
         <div class="card__body">
@@ -331,12 +331,11 @@
 
           <div class="row row--between">
             <div class="row row--gap">
-              <button class="btn btn--ghost" id="btnAddItem" type="button">＋ Adicionar item</button>
-              <button class="btn btn--danger" id="btnClearItens" type="button">🗑 Limpar itens</button>
+              <button id="btnAddItem" type="button" class="btn btn--ghost">＋ Adicionar item</button>
+              <button id="btnClearItens" type="button" class="btn btn--danger">🗑 Limpar</button>
             </div>
             <div class="valor-global">
-              Valor Global Estimado:
-              <strong id="valorGlobal" class="text-primary">R$ 0,00</strong>
+              Valor Global: <strong id="valorGlobal">R$ 0,00</strong>
             </div>
           </div>
 
@@ -354,66 +353,91 @@
       <details open>
         <summary class="card__head">
           <span class="card__num">7</span>
-          <span class="card__title">Prazos, Vigência e Execução</span>
-          <span class="chev" aria-hidden="true">▾</span>
+          <span class="card__title">Prazos, Vigência e Cronograma</span>
+          <span class="chev">▾</span>
         </summary>
 
         <div class="card__body grid grid--2">
           <label class="field">
             <span class="label">Prazo de Vigência Contratual</span>
-            <input class="input" data-bind="processo.vigencia" placeholder="Ex.: 12 (doze) meses, prorrogável por até 60 meses" />
+            <input class="input" data-bind="processo.vigencia"
+              placeholder="Ex.: 12 (doze) meses, prorrogável por até 60 meses" />
           </label>
           <label class="field">
             <span class="label">Prazo de Execução / Entrega</span>
-            <input class="input" data-bind="processo.prazoExecucao" placeholder="Ex.: 30 (trinta) dias corridos após o recebimento da nota de empenho" />
+            <input class="input" data-bind="processo.prazoExecucao"
+              placeholder="Ex.: 30 (trinta) dias corridos após emissão da nota de empenho" />
           </label>
           <label class="field field--full">
-            <span class="label">Cronograma / Marco de Execução</span>
-            <textarea class="input textarea" data-bind="processo.cronograma" rows="3"
+            <span class="label">Cronograma / Marcos de Execução</span>
+            <textarea class="input textarea" data-bind="processo.cronograma"
               placeholder="Ex.: Etapa 1 — mobilização em 5 dias; Etapa 2 — entrega parcial em 15 dias; Etapa 3 — conclusão em 30 dias."></textarea>
           </label>
         </div>
       </details>
     </section>
 
-    <!-- 8. FISCALIZAÇÃO -->
+    <!-- 8. SIGNATÁRIOS -->
     <section class="card">
       <details open>
         <summary class="card__head">
           <span class="card__num">8</span>
-          <span class="card__title">Modelo de Gestão e Equipe de Fiscalização</span>
-          <span class="chev" aria-hidden="true">▾</span>
+          <span class="card__title">Signatários do Termo de Referência</span>
+          <span id="signatariosCount" class="badge badge--info">0</span>
+          <span class="chev">▾</span>
         </summary>
 
-        <div class="card__body grid grid--3">
+        <div class="card__body">
+          <div class="row row--between">
+            <p class="hint">
+              Adicione os responsáveis que assinarão o TR.
+              O PDF organiza automaticamente até <strong>6 assinaturas por página</strong> (grade 2×3).
+            </p>
+            <button id="btnAddSignatario" type="button" class="btn btn--primary">
+              ＋ Adicionar Signatário
+            </button>
+          </div>
+
+          <div id="signatariosList" class="signatarios-list"></div>
+
+          <div id="signatariosEmpty" class="signatarios-empty hidden">
+            Nenhum signatário cadastrado. Clique em <strong>Adicionar Signatário</strong> para começar.
+          </div>
+
+          <p class="hint">
+            <strong>Ordem de exibição no PDF:</strong> a grade é preenchida da esquerda para a direita,
+            de cima para baixo, em blocos de 2 colunas × 3 linhas por página.
+          </p>
+        </div>
+      </details>
+    </section>
+
+    <!-- 9. MODELO DE GESTÃO -->
+    <section class="card">
+      <details open>
+        <summary class="card__head">
+          <span class="card__num">9</span>
+          <span class="card__title">Modelo de Gestão e Fiscalização</span>
+          <span class="chev">▾</span>
+        </summary>
+
+        <div class="card__body">
           <label class="field">
-            <span class="label">Gestor do Contrato</span>
-            <input class="input" data-bind="equipe.gestor" placeholder="Nome / matrícula" />
-          </label>
-          <label class="field">
-            <span class="label">Fiscal Técnico</span>
-            <input class="input" data-bind="equipe.fiscalTecnico" placeholder="Nome / matrícula" />
-          </label>
-          <label class="field">
-            <span class="label">Fiscal Administrativo</span>
-            <input class="input" data-bind="equipe.fiscalAdministrativo" placeholder="Nome / matrícula" />
-          </label>
-          <label class="field field--full">
             <span class="label">Modelo de Gestão / Rotinas de Fiscalização</span>
-            <textarea class="input textarea" data-bind="processo.modeloGestao" rows="3"
+            <textarea class="input textarea" data-bind="processo.modeloGestao"
               placeholder="Ex.: Vistoria trimestral, relatório de conformidade, aceite definitivo em 15 dias (art. 140 da Lei nº 14.133/2021)."></textarea>
           </label>
         </div>
       </details>
     </section>
 
-    <!-- 9. CONDIÇÕES CONTRATUAIS -->
+    <!-- 10. CONDIÇÕES CONTRATUAIS -->
     <section class="card">
       <details open>
         <summary class="card__head">
-          <span class="card__num">9</span>
+          <span class="card__num">10</span>
           <span class="card__title">Execução, Pagamento, Garantia e Sanções</span>
-          <span class="chev" aria-hidden="true">▾</span>
+          <span class="chev">▾</span>
         </summary>
 
         <div class="card__body">
@@ -429,37 +453,37 @@
           </label>
           <label class="field">
             <span class="label">Garantia Contratual (art. 96 e ss.)</span>
-            <textarea class="input textarea" data-bind="processo.garantia" rows="3"
+            <textarea class="input textarea" data-bind="processo.garantia"
               placeholder="Ex.: Garantia de execução de 5% do valor inicial, nas modalidades do art. 96, §1º..."></textarea>
           </label>
           <label class="field">
             <span class="label">Sanções Administrativas (arts. 155 a 163)</span>
-            <textarea class="input textarea" data-bind="processo.sancoes" rows="3"
+            <textarea class="input textarea" data-bind="processo.sancoes"
               placeholder="Advertência, multa, impedimento de licitar e declaração de inidoneidade..."></textarea>
           </label>
         </div>
       </details>
     </section>
 
-    <!-- 10. SUSTENTABILIDADE / LGPD -->
+    <!-- 11. SUSTENTABILIDADE / LGPD -->
     <section class="card">
       <details>
         <summary class="card__head">
-          <span class="card__num">10</span>
+          <span class="card__num">11</span>
           <span class="card__title">Sustentabilidade, LGPD e Disposições Gerais</span>
-          <span class="chev" aria-hidden="true">▾</span>
+          <span class="chev">▾</span>
         </summary>
 
         <div class="card__body">
           <label class="field">
-            <span class="label">Critérios de Sustentabilidade (art. 5º e IN 01/2010)</span>
-            <textarea class="input textarea" data-bind="processo.sustentabilidade" rows="3"
+            <span class="label">Critérios de Sustentabilidade (art. 5º)</span>
+            <textarea class="input textarea" data-bind="processo.sustentabilidade"
               placeholder="Ex.: Bens com certificação ambiental, logística reversa, eficiência energética..."></textarea>
           </label>
           <label class="field">
             <span class="label">Proteção de Dados (LGPD — Lei nº 13.709/2018)</span>
-            <textarea class="input textarea" data-bind="processo.lgpd" rows="3"
-              placeholder="Ex.: Tratamento de dados pessoais limitado à execução do objeto, com base legal no art. 7º, II..."></textarea>
+            <textarea class="input textarea" data-bind="processo.lgpd"
+              placeholder="Ex.: Tratamento de dados pessoais limitado à execução do objeto..."></textarea>
           </label>
           <label class="field">
             <span class="label">Disposições Gerais e Observações</span>
@@ -469,7 +493,6 @@
         </div>
       </details>
     </section>
-
   </div>
 
   <!-- ─── COLUNA AUDITORIA ─── -->
@@ -483,11 +506,9 @@
             <h2 class="card__title-sm">Auditoria em Tempo Real</h2>
             <span id="auditScore" class="badge badge--ok">100%</span>
           </div>
-
           <div class="progress">
             <div id="auditBar" class="progress__bar progress__bar--ok" style="width:100%"></div>
           </div>
-
           <div class="score-grid">
             <div class="score-cell score-cell--crit">
               <p id="cntCritico" class="score-cell__num">0</p>
@@ -509,7 +530,7 @@
       <div class="card card--compact">
         <div class="card__head-plain">
           <h3 class="card__title-sm">Apontamentos</h3>
-          <span id="auditTotal" class="badge badge--ghost">0</span>
+          <span id="auditTotal" class="badge badge--info">0</span>
         </div>
         <div id="auditList" class="audit-list"></div>
       </div>
@@ -518,7 +539,6 @@
       <div class="card card--compact">
         <div class="card__body">
           <h3 class="card__title-sm">Rastreabilidade OmniLicit</h3>
-
           <div class="trace">
             <div>
               <span class="label">Selo Digital</span>
@@ -529,12 +549,11 @@
               <code id="traceHash" class="trace__code trace__code--ok">aguardando conteúdo…</code>
             </div>
             <div>
-              <span class="label">Auditoria cruzada</span>
+              <span class="label">Auditoria Cruzada</span>
               <p class="hint">Módulo <strong>LicitaAudit</strong> · <span id="traceTs">—</span></p>
             </div>
           </div>
-
-          <button class="btn btn--primary btn--block" id="btnPdf2" type="button">
+          <button id="btnPdf2" type="button" class="btn btn--primary btn--block">
             📄 Gerar Termo de Referência
           </button>
         </div>
@@ -545,14 +564,11 @@
 
 </main>
 
-
-<!-- ═══════════════ FOOTER ═══════════════ -->
-<footer class="app-footer">
+<footer class="app-footer no-print">
   <div class="container">
     OmniLicit · LicitaTR v1.0.0 — Ecossistema de Licitações Públicas · Lei nº 14.133/2021
   </div>
 </footer>
-
 
 <script src="script.js"></script>
 </body>
